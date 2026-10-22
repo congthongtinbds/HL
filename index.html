@@ -1,73 +1,179 @@
 <!doctype html>
 <html lang="vi">
 <head>
+<script>
+/* link cũ: .../HL/?sf hoặc .../HL/#2/sf → trang sf.html */
+(function(){var K=["sf","sfdongtien","ih","ihdongtien","sc","scdongtien","sb","sbdongtien","lm","lmdongtien","pb","pbdongtien","dongtien","hlx","hlxdongtien","ab","abdongtien"];
+var q=(location.search||"").replace(/^\?/,"").split("&")[0].replace(/^(p|page)=/,"").toLowerCase();
+var h=(location.hash||"").replace(/^#\/?/,"").match(/^([12])(?:\/([\w-]*))?$/);
+if(!q&&h){var pg=h[2]||""; q=h[1]==="1"?(pg===""?"pb":pg==="dongtien"?"pbdongtien":pg):(pg||"");}
+if(q==="dongtien") q="pbdongtien";
+if(K.indexOf(q)>=0) location.replace("./"+q+".html");})();
+</script>
+<script>
+/* ===== Bản đặt trên GitHub Pages: thay google.script.run bằng gọi máy chủ Apps Script qua JSONP =====
+   Trang chạy thẳng trên congthongtinbds.github.io (không qua khung Google) nên không có dải cảnh báo
+   và không bị lỗi "không thể mở tệp" khi trình duyệt đăng nhập nhiều tài khoản Google. */
+(function(){
+var SV="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec", P1="AKfycbywAdmP2T72-qYtLfUoaBnQpxfNhr_r3zxNEzh-pcIkuDU9xPyjyP09KwkP_ILUR3ufkA";
+function jsonp(q){return new Promise(function(ok,no){
+  var cb="gh"+Date.now()+Math.floor(Math.random()*1e6), s=document.createElement("script"), to=setTimeout(function(){end();no(new Error("NET"));},20000);
+  function end(){try{delete window[cb];}catch(e){} s.remove(); clearTimeout(to);}
+  window[cb]=function(r){end();ok(r);}; s.onerror=function(){end();no(new Error("NET"));};
+  var u=SV+"?callback="+cb+"&t="+Date.now(); for(var k in q) u+="&"+k+"="+encodeURIComponent(q[k]);
+  s.src=u; (document.head||document.documentElement).appendChild(s);});}
+var CALL={
+  kichHoat:function(phone,device){return jsonp({phone:phone,device:device});},
+  xinXuatPdf:function(phone){return jsonp({action:"pdf",phone:phone});},
+  dsAnh:function(d){return jsonp({action:"anh",du_an:d}).then(function(r){return (r&&r.anh)||{};});},
+  urlApp:function(){return Promise.resolve(null);}
+};
+function runner(s,f){return new Proxy({},{get:function(_,n){
+  if(n==="withSuccessHandler") return function(h){return runner(h,f);};
+  if(n==="withFailureHandler") return function(h){return runner(s,h);};
+  if(n==="withUserObject") return function(){return runner(s,f);};
+  if(!CALL[n]) return undefined;
+  return function(){CALL[n].apply(null,arguments).then(function(r){if(s)s(r);},function(e){if(f)f(e);});};}});}
+var Q={}; (location.search||"").replace(/^\?/,"").split("&").forEach(function(x){if(!x)return;var i=x.indexOf("=");Q[decodeURIComponent(i<0?x:x.slice(0,i))]=i<0?"":decodeURIComponent(x.slice(i+1));});
+window.google={script:{run:runner(null,null),url:{getLocation:function(cb){setTimeout(function(){cb({parameter:Q,hash:location.hash.replace(/^#/,"")});},0);}}}};
+// link sang trang khác của ứng dụng (dạng script.google.com/...?page=x) → trang tương ứng trên GitHub (x.html)
+function keyOf(h){var m=h.match(/^https:\/\/script\.google\.com\/macros\/s\/([\w-]+)\/exec(?:\?(?:.*&)?page=([\w-]*))?/); if(!m) return null;
+  var pg=m[2]||""; if(m[1]===P1){ if(!pg) return "pb"; if(pg==="dongtien") return "pbdongtien"; } return pg||"app";}
+function fix(a){var h=a.getAttribute("href")||""; if(h.indexOf("https://script.google.com/macros/s/")!==0) return; var k=keyOf(h); if(!k) return;
+  a.setAttribute("href",k==="app"?"./":"./"+k+".html"); a.removeAttribute("target");}
+function fixAll(){var L=document.querySelectorAll("a[href]"); for(var i=0;i<L.length;i++) fix(L[i]);}
+document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fixAll,1000); setTimeout(fixAll,4000);});
+["click","contextmenu","mousedown","touchstart","focusin","mouseover"].forEach(function(ev){document.addEventListener(ev,function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null; if(a) fix(a);},true);});
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Tra cứu dự án BĐS">
-<meta name="theme-color" content="#12463f">
 <title>Tra cứu thông tin dự án bất động sản</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,650&display=swap">
 <style>
-html,body{margin:0;height:100%;background:#12463f;overflow:hidden}
-iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff}
-#wait{position:fixed;inset:0;display:grid;place-items:center;color:#fff;font:15px/1.5 system-ui,sans-serif;text-align:center;padding:20px}
+/* Một cột dọc như thực đơn: tiêu đề có dải núi đá vôi, sáu dự án xếp hàng, mỗi dự án 2 nút. */
+:root{
+  --jade:#0e4f4b; --jade-2:#17736d; --karst:#082f2d; --stone:#eef0eb; --panel:#ffffff;
+  --ink:#16302e; --muted:#5b6f6c; --line:#d5ddd9; --gold:#b88a2e; --gold-soft:#f3e9d2;
+  --display:"Fraunces",Georgia,serif; --body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --stone:#0d1918; --panel:#13221f; --ink:#e7efec; --muted:#9db1ad; --line:#2a3d3a; --gold:#d8b363; --gold-soft:#2f2816; color-scheme:dark}}
+:root[data-theme="dark"]{--stone:#0d1918; --panel:#13221f; --ink:#e7efec; --muted:#9db1ad; --line:#2a3d3a; --gold:#d8b363; --gold-soft:#2f2816; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--stone);color:var(--ink);font:15px/1.5 var(--body);-webkit-text-size-adjust:100%}
+a{color:inherit}
+.top{background:var(--jade);color:#f3efe2;position:relative;overflow:hidden;padding:calc(env(safe-area-inset-top) + 22px) 16px 0}
+.top-in{max-width:640px;margin:0 auto;position:relative;z-index:1}
+.top h1{font:650 27px/1.15 var(--display);margin:0;letter-spacing:-.01em}
+.top p{margin:6px 0 0;color:#cfe1dc;font-size:14px}
+.who{display:flex;align-items:center;gap:12px;margin-top:16px;padding-bottom:86px}
+.who b{display:block;font-weight:600}
+.who span{color:#cfe1dc;font-size:13px}
+.call{margin-left:auto;background:#d4ac52;color:#1d1503;text-decoration:none;font-weight:600;border-radius:999px;padding:9px 16px;white-space:nowrap}
+.call:focus-visible,.btn:focus-visible,summary:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.karst{position:absolute;left:0;right:0;bottom:0;height:96px;width:100%}
+main{max-width:640px;margin:0 auto;padding:4px 16px 40px}
+.proj{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;margin-top:12px;border-left:6px solid var(--c,var(--jade-2))}
+.proj h2{font:600 22px/1.2 var(--display);margin:0}
+.proj .where{color:var(--muted);font-size:13.5px;margin:3px 0 12px}
+.proj .stat{font-size:12.5px;color:var(--muted);margin:-6px 0 10px;padding:5px 9px;border-radius:8px;background:var(--stone)}.proj .stat b{color:var(--ink);font-weight:600}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{display:flex;flex-direction:column;justify-content:center;min-height:56px;text-decoration:none;border-radius:10px;padding:8px 12px;font-weight:600;border:1px solid var(--line);background:var(--stone)}
+.btn small{font-weight:400;color:var(--muted);font-size:12px}
+.btn.qa{background:var(--c,var(--jade-2));border-color:transparent;color:#fff}
+.btn.qa small{color:rgba(255,255,255,.82)}
+.btn:active{transform:translateY(1px)}
+h3{font:600 13px/1.3 var(--body);color:var(--muted);margin:28px 0 8px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-top:8px}
+summary{cursor:pointer;font-weight:600}
+details ol{margin:10px 0 4px;padding-left:20px}
+details li{margin:4px 0}
+.note{font-size:12.5px;color:var(--muted);margin-top:18px}
+@media (prefers-reduced-motion:no-preference){.proj{animation:rise .35s ease-out both}.proj:nth-child(2){animation-delay:.04s}.proj:nth-child(3){animation-delay:.08s}.proj:nth-child(4){animation-delay:.12s}.proj:nth-child(5){animation-delay:.16s}.proj:nth-child(6){animation-delay:.2s}.proj:nth-child(7){animation-delay:.24s}@keyframes rise{from{opacity:0;transform:translateY(6px)}}}
 </style>
 </head>
 <body>
-<div id="wait">Đang mở ứng dụng…<br><small>Tư vấn viên Lương Văn Chung – 081.363.1111</small></div>
-<iframe id="app" title="Tra cứu thông tin dự án bất động sản" allow="clipboard-write; fullscreen; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<header class="top">
+  <div class="top-in">
+    <h1>Tra cứu thông tin dự án bất động sản</h1>
+    <p>Hỏi đáp và bảng tính dòng tiền (xuất được file PDF) của 8 dự án căn hộ, nhà phố – chọn dự án để mở.</p>
+    <div class="who"><div><b>Lương Văn Chung</b><span>Hỗ trợ kỹ thuật</span></div><a class="call" href="tel:0813631111">Gọi 081.363.1111</a></div>
+  </div>
+  <svg class="karst" viewBox="0 0 640 96" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 96V70L38 40 62 22 84 48 104 64 132 30 150 8 176 4 196 36 214 70 250 56 272 26 296 18 318 46 340 70 372 60 398 34 418 20 446 44 470 70 510 52 536 30 560 24 590 50 614 66 640 58V96Z" fill="#082f2d" opacity=".55"/>
+    <path d="M0 96V82L60 74 120 84 200 76 280 86 360 78 440 86 520 76 600 84 640 80V96Z" fill="var(--stone)"/>
+  </svg>
+</header>
+
+<main>
+  <div id="list"></div>
+
+  <h3>Cài thành ứng dụng trên điện thoại</h3>
+  <details>
+    <summary>iPhone (Safari)</summary>
+    <ol><li>Mở trang này bằng <b>Safari</b>.</li><li>Bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên lên) ở thanh dưới.</li><li>Chọn <b>Thêm vào MH chính</b>, đặt tên "Tra cứu dự án BĐS", bấm <b>Thêm</b>.</li></ol>
+  </details>
+  <details>
+    <summary>Android (Chrome)</summary>
+    <ol><li>Mở trang này bằng <b>Chrome</b>.</li><li>Bấm <b>⋮</b> ở góc trên bên phải.</li><li>Chọn <b>Thêm vào màn hình chính</b> (hoặc <b>Cài đặt ứng dụng</b>), bấm <b>Thêm</b>.</li></ol>
+  </details>
+  <p class="note">Lần mở đầu tiên, nhập số điện thoại để dùng thử miễn phí ngay. Giá, chính sách và tình trạng căn trong ứng dụng để tham khảo; hợp đồng là căn cứ cuối cùng.</p>
+</main>
+
 <script>
-/* Khung mở ứng dụng Apps Script để không hiện dải cảnh báo "Ứng dụng này do một người dùng Google Apps Script tạo".
-   Thanh địa chỉ luôn giữ link gốc (không thêm ký tự phía sau) – sao chép link lúc nào cũng ra link gốc.
-   Link mở thẳng một dự án: thêm ?mã trang, ví dụ .../HL/?sf (Sun Festo), .../HL/?scdongtien (Dòng tiền Sun Centro). */
-var P = {
-  "1": "https://script.google.com/macros/s/AKfycbywAdmP2T72-qYtLfUoaBnQpxfNhr_r3zxNEzh-pcIkuDU9xPyjyP09KwkP_ILUR3ufkA/exec",
-  "2": "https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec"
-};
-// mã trang → [dự án Apps Script, tham số page]
-var PAGES = {
-  app:["2","app"], sf:["2","sf"], sfdongtien:["2","sfdongtien"], ih:["2","ih"], ihdongtien:["2","ihdongtien"],
-  sc:["2","sc"], scdongtien:["2","scdongtien"], sb:["2","sb"], sbdongtien:["2","sbdongtien"], lm:["2","lm"], lmdongtien:["2","lmdongtien"],
-  pb:["1",""], dongtien:["1","dongtien"], pbdongtien:["1","dongtien"], hlx:["1","hlx"], hlxdongtien:["1","hlxdongtien"], ab:["1","ab"], abdongtien:["1","abdongtien"]
-};
-var fr = document.getElementById("app");
-var BASE = location.pathname;   // link gốc, không có ?… hay #…
-var SELF = location.origin + BASE;   // địa chỉ trang khung: app dùng để hiện link dạng .../HL/?sf khi sao chép
-function urlOf(key) { var p = PAGES[key] || PAGES.app; return P[p[0]] + "?" + (p[1] ? "page=" + p[1] + "&" : "") + "khung=" + encodeURIComponent(SELF); }
-function keyOfUrl(url) {
-  for (var k in P) if (url.indexOf(P[k]) === 0) {
-    var pg = (url.match(/[?&]page=([\w-]+)/) || [])[1] || "";
-    for (var key in PAGES) if (PAGES[key][0] === k && PAGES[key][1] === pg) return key;
-  }
-  return null;
-}
-function startKey() {
-  var q = (location.search || "").replace(/^\?/, "").split("&")[0].replace(/^(p|page)=/, "").toLowerCase();
-  if (PAGES[q]) return q;
-  var h = (location.hash || "").replace(/^#\/?/, "").match(/^([12])(?:\/([\w-]*))?$/);   // link cũ dạng #2/sf
-  if (h) { var k = keyOfUrl(P[h[1]] + (h[2] ? "?page=" + h[2] : "")); if (k) return k; }
-  return "app";
-}
-var started = false;
-function show(key) {   // thay trang trong khung, không tạo thêm bước trong lịch sử trình duyệt
-  var u = urlOf(key);
-  if (!started) { started = true; fr.src = u; return; }
-  try { fr.contentWindow.location.replace(u); } catch (err) { fr.src = u; }
-}
-fr.addEventListener("load", function () { document.getElementById("wait").style.display = "none"; });
-// chuyển trang trong ứng dụng: mở trong khung, giữ nút Quay lại của trình duyệt, thanh địa chỉ vẫn là link gốc
-window.addEventListener("message", function (e) {
-  var d = e.data;
-  if (!d || d.khung !== "go" || typeof d.url !== "string") return;
-  var key = keyOfUrl(d.url); if (!key) return;
-  try { history.pushState({ k: key }, "", BASE); } catch (err) {}
-  show(key);
-});
-window.addEventListener("popstate", function (e) { show(e.state && e.state.k ? e.state.k : "app"); });
-var k0 = startKey();
-try { history.replaceState({ k: k0 }, "", BASE); } catch (err) {}
-show(k0);
+(function(){
+const P1="https://script.google.com/macros/s/AKfycbywAdmP2T72-qYtLfUoaBnQpxfNhr_r3zxNEzh-pcIkuDU9xPyjyP09KwkP_ILUR3ufkA/exec";
+const P2="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec";
+// [tên, vị trí, màu, dự án Apps Script, trang hỏi đáp, trang dòng tiền, tên nút dòng tiền]
+const PROJ=[
+ ["Sun Centro Town","Sun Elite City, Bãi Cháy · tòa C1, C2, C3","#1d3b63","p2","sc","scdongtien","Dòng tiền"],
+ ["Sora Bay Halong","Nhà phố thương mại · bán đảo 2, Halong Marina","#8a4b2a","p2","sb","sbdongtien","Dòng tiền"],
+ ["Landmark 35","Căn hộ cao tầng · Trần Hưng Đạo, Hồng Gai","#7a5c1e","p2","lm","lmdongtien","Dòng tiền"],
+ ["Sun Festo Town","Sun Elite City, Bãi Cháy · tòa F2","#a3162b","p2","sf","sfdongtien","Dòng tiền"],
+ ["Imperia Holiday","The Bayside Hạ Long · MIK Group","#6b4e8a","p2","ih","ihdongtien","Dòng tiền"],
+ ["Prima Bay","Bãi Cháy, Hạ Long","#0f6f68","p1","","dongtien","Dòng tiền homestay"],
+ ["Aria Bay","Hạ Long","#2f6a9a","p1","ab","abdongtien","Dòng tiền"],
+ ["Vin Hạ Long Xanh","Vinhomes Global Gate Hạ Long","#3f7a2e","p1","hlx","hlxdongtien","Dòng tiền"]];
+// số liệu bộ hỏi đáp: [chủ đề, cách hỏi, số câu hỏi tra được (ước tính: các cách hỏi + 5 dạng hỏi cho mỗi căn có dữ liệu)] – cập nhật 22/10/2026
+const STAT={"sc": [29, 228, 1600], "sb": [24, 203, 1500], "lm": [22, 193, 300], "sf": [28, 215, 600], "ih": [29, 228, 700], "": [68, 404, 2700], "ab": [31, 230, 1400], "hlx": [30, 236, 5300]};
+const nf=n=>n.toLocaleString("vi-VN");
+const url=(base,page)=>base+(page?"?page="+page:"");
+const list=document.getElementById("list");
+list.innerHTML=PROJ.map(([n,w,c,p,qa,dt,dtl])=>{const b=p==="p1"?P1:P2;
+  return `<section class="proj" style="--c:${c}" data-p="${p}"><h2>${n}</h2><div class="where">${w}</div>${STAT[qa]?`<div class="stat">Hỏi đáp: <b>${STAT[qa][0]}</b> chủ đề · <b>${nf(STAT[qa][1])}</b> cách hỏi · khoảng <b>${nf(STAT[qa][2])}</b> câu hỏi</div>`:""}<div class="acts">
+  <a class="btn qa" target="_top" data-page="${qa}" href="${url(b,qa)}">Hỏi đáp<small>mã căn, giá, vay</small></a>
+  <a class="btn" target="_top" data-page="${dt}" href="${url(b,dt)}">${dtl}<small>các đợt đóng tiền · xuất PDF</small></a></div></section>`;}).join("");
+// trang này chạy trong dự án Apps Script 02: link của dự án 02 lấy đúng địa chỉ đang chạy
+if(window.google&&google.script&&google.script.run){google.script.run.withSuccessHandler(u=>{if(!u)return;
+  document.querySelectorAll('.proj[data-p="p2"] a').forEach(a=>{a.href=url(u,a.dataset.page);});}).urlApp();}
+})();
 </script>
 </body>
 </html>
+<script>
+/* khung không cảnh báo: chuyển trang trong khung; link trong app hiện dạng link trang khung để sao chép */
+(function(){
+var framed=false; try{framed=window.top!==window.parent;}catch(e){framed=true;}
+if(!framed) return;
+var GAS="https://script.google.com/macros/s/", P1="AKfycbywAdmP2T72-qYtLfUoaBnQpxfNhr_r3zxNEzh-pcIkuDU9xPyjyP09KwkP_ILUR3ufkA", KH=null;
+function keyOf(h){var m=h.match(/^https:\/\/script\.google\.com\/macros\/s\/([\w-]+)\/exec(?:\?(?:.*&)?page=([\w-]*))?/); if(!m) return null;
+  var pg=m[2]||""; if(m[1]===P1){ if(!pg) return "pb"; if(pg==="dongtien") return "pbdongtien"; } return pg||"app";}
+function gasOf(a){var h=a.getAttribute("href")||""; return h.indexOf(GAS)===0?h:(a.getAttribute("data-gas")||"");}
+function fix(a){var g=gasOf(a); if(!g||!KH) return; var k=keyOf(g); if(!k) return; a.setAttribute("data-gas",g); a.setAttribute("href",KH+"?"+k);}
+function fixAll(){if(!KH) return; var L=document.querySelectorAll("a[href]"); for(var i=0;i<L.length;i++) fix(L[i]);}
+try{google.script.url.getLocation(function(l){var k=l&&l.parameter&&l.parameter.khung; if(k&&/^https:\/\//.test(k)){KH=k; fixAll(); setTimeout(fixAll,1500); setTimeout(fixAll,5000);}});}catch(e){}
+["contextmenu","mousedown","touchstart","focusin","mouseover"].forEach(function(ev){document.addEventListener(ev,function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null; if(a) fix(a);},true);});
+document.addEventListener("click",function(e){
+  if(e.button||e.ctrlKey||e.metaKey||e.shiftKey) return;
+  var a=e.target&&e.target.closest?e.target.closest("a[href]"):null; if(!a) return;
+  var g=gasOf(a); if(!g) return;
+  e.preventDefault(); e.stopPropagation();
+  try{window.top.postMessage({khung:"go",url:g},"*");}catch(err){window.open(g,"_top");}
+},true);
+})();
+</script>
