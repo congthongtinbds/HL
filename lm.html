@@ -2,42 +2,8 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<script>
-/* ===== Bản đặt trên GitHub Pages: thay google.script.run bằng gọi máy chủ Apps Script qua JSONP =====
-   Trang chạy thẳng trên congthongtinbds.github.io (không qua khung Google) nên không có dải cảnh báo
-   và không bị lỗi "không thể mở tệp" khi trình duyệt đăng nhập nhiều tài khoản Google. */
-(function(){
-var SV="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec", P1="AKfycbywAdmP2T72-qYtLfUoaBnQpxfNhr_r3zxNEzh-pcIkuDU9xPyjyP09KwkP_ILUR3ufkA";
-function jsonp(q){return new Promise(function(ok,no){
-  var cb="gh"+Date.now()+Math.floor(Math.random()*1e6), s=document.createElement("script"), to=setTimeout(function(){end();no(new Error("NET"));},20000);
-  function end(){try{delete window[cb];}catch(e){} s.remove(); clearTimeout(to);}
-  window[cb]=function(r){end();ok(r);}; s.onerror=function(){end();no(new Error("NET"));};
-  var u=SV+"?callback="+cb+"&t="+Date.now(); for(var k in q) u+="&"+k+"="+encodeURIComponent(q[k]);
-  s.src=u; (document.head||document.documentElement).appendChild(s);});}
-var CALL={
-  kichHoat:function(phone,device){return jsonp({phone:phone,device:device});},
-  xinXuatPdf:function(phone){return jsonp({action:"pdf",phone:phone});},
-  dsAnh:function(d){return jsonp({action:"anh",du_an:d}).then(function(r){return (r&&r.anh)||{};});},
-  urlApp:function(){return Promise.resolve(null);}
-};
-function runner(s,f){return new Proxy({},{get:function(_,n){
-  if(n==="withSuccessHandler") return function(h){return runner(h,f);};
-  if(n==="withFailureHandler") return function(h){return runner(s,h);};
-  if(n==="withUserObject") return function(){return runner(s,f);};
-  if(!CALL[n]) return undefined;
-  return function(){CALL[n].apply(null,arguments).then(function(r){if(s)s(r);},function(e){if(f)f(e);});};}});}
-var Q={}; (location.search||"").replace(/^\?/,"").split("&").forEach(function(x){if(!x)return;var i=x.indexOf("=");Q[decodeURIComponent(i<0?x:x.slice(0,i))]=i<0?"":decodeURIComponent(x.slice(i+1));});
-window.google={script:{run:runner(null,null),url:{getLocation:function(cb){setTimeout(function(){cb({parameter:Q,hash:location.hash.replace(/^#/,"")});},0);}}}};
-// link sang trang khác của ứng dụng (dạng script.google.com/...?page=x) → trang tương ứng trên GitHub (x.html)
-function keyOf(h){var m=h.match(/^https:\/\/script\.google\.com\/macros\/s\/([\w-]+)\/exec(?:\?(?:.*&)?page=([\w-]*))?/); if(!m) return null;
-  var pg=m[2]||""; if(m[1]===P1){ if(!pg) return "pb"; if(pg==="dongtien") return "pbdongtien"; } return pg||"app";}
-function fix(a){var h=a.getAttribute("href")||""; if(h.indexOf("https://script.google.com/macros/s/")!==0) return; var k=keyOf(h); if(!k) return;
-  a.setAttribute("href",k==="app"?"./":"./"+k+".html"); a.removeAttribute("target");}
-function fixAll(){var L=document.querySelectorAll("a[href]"); for(var i=0;i<L.length;i++) fix(L[i]);}
-document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fixAll,1000); setTimeout(fixAll,4000);});
-["click","contextmenu","mousedown","touchstart","focusin","mouseover"].forEach(function(ev){document.addEventListener(ev,function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null; if(a) fix(a);},true);});
-})();
-</script>
+<script>window.__GH_SV="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec";</script>
+<script src="gh.js?v=3"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Landmark 35 Hỏi Đáp</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -173,7 +139,7 @@ button.send:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
       <h1>Landmark 35 <span>Hỏi Đáp</span></h1>
       <div class="sub">The Landmark 35 – căn hộ cao tầng đường Trần Hưng Đạo, Hồng Gai, Hạ Long: hỏi về dự án, mã căn, giá, chính sách, tiến độ, vay, pháp lý. Dùng được không cần mạng sau khi kích hoạt.</div>
     </div>
-    <div class="contact">Tư vấn viên <b>Lương Văn Chung</b><br>081.363.1111<div class="lic" id="lic"></div><details class="paybox" id="pay_side"><summary>&#128275; Mở khóa ứng dụng – quét mã QR chuyển khoản</summary><p>Khi hết thời gian dùng thử hoặc hết hạn, anh/chị chuyển khoản theo mã QR dưới đây. <b>Nội dung chuyển khoản: ghi đúng số điện thoại đăng ký mở khóa</b> (ví dụ: 0912345678).</p><div class="payqr" role="img" aria-label="Mã QR chuyển khoản TPBank"></div><p class="acc">TPBank · <b>1135 7999 999</b> · LUONG VAN CHUNG</p><p>Sau khi chuyển khoản, ứng dụng được mở khóa theo số điện thoại đó. Cần hỗ trợ: Zalo 081.363.1111 (Lương Văn Chung).</p></details><a class="navl" target="_top" href="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec?page=lmdongtien">Mở bảng tính dòng tiền →</a></div>
+    <div class="contact">Tư vấn viên <b>Lương Văn Chung</b><br>081.363.1111<div class="lic" id="lic"></div><details class="paybox" id="pay_side"><summary>&#128275; Mở khóa ứng dụng – quét mã QR chuyển khoản</summary><p>Khi hết thời gian dùng thử hoặc hết hạn, anh/chị chuyển khoản theo mã QR dưới đây. <b>Nội dung chuyển khoản: ghi đúng số điện thoại đăng ký mở khóa</b> (ví dụ: 0813631111).</p><div class="payqr" role="img" aria-label="Mã QR chuyển khoản TPBank"></div><p class="acc">TPBank · <b>1135 7999 999</b> · LUONG VAN CHUNG</p><p>Sau khi chuyển khoản, ứng dụng được mở khóa theo số điện thoại đó. Cần hỗ trợ: Zalo 081.363.1111 (Lương Văn Chung).</p></details><a class="navl" target="_top" href="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec?page=lmdongtien">Mở bảng tính dòng tiền →</a></div>
   </header>
   <div class="main">
     <aside id="side"></aside>
@@ -193,8 +159,8 @@ button.send:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
     <h1>Landmark 35 <span>Hỏi Đáp</span></h1>
     <p>Nhập số điện thoại để dùng thử miễn phí ngay. Số đã được cấp quyền thì dùng theo thời hạn đã cấp.</p>
     <label for="gp">Số điện thoại</label>
-    <input id="gp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="0912 345 678" required>
-    <div id="gzalo" style="margin:10px 0;padding:9px 11px;border-radius:9px;background:#fff4e0;border:1px solid #f0d29a;color:#7a4b00;font-size:13.5px;line-height:1.45;text-align:left">&#9888; <b>Nhập số điện thoại chính chủ có đăng ký Zalo.</b> Quyền sử dụng được xác minh qua Zalo theo số này; số không đúng chủ hoặc không có Zalo sẽ bị khóa.<label style="display:flex;gap:7px;align-items:flex-start;margin-top:7px;font-weight:600;cursor:pointer"><input type="checkbox" required style="width:auto;margin:2px 0 0;flex:none"> Tôi xác nhận đây là số chính chủ, có Zalo.</label></div><details class="paybox" id="pay_gate" open><summary>&#128275; Mở khóa ứng dụng – quét mã QR chuyển khoản</summary><p>Khi hết thời gian dùng thử hoặc hết hạn, anh/chị chuyển khoản theo mã QR dưới đây. <b>Nội dung chuyển khoản: ghi đúng số điện thoại đăng ký mở khóa</b> (ví dụ: 0912345678).</p><div class="payqr" role="img" aria-label="Mã QR chuyển khoản TPBank"></div><p class="acc">TPBank · <b>1135 7999 999</b> · LUONG VAN CHUNG</p><p>Sau khi chuyển khoản, ứng dụng được mở khóa theo số điện thoại đó. Cần hỗ trợ: Zalo 081.363.1111 (Lương Văn Chung).</p></details>
+    <input id="gp" type="tel" inputmode="numeric" autocomplete="tel" required>
+    <div id="gzalo" style="margin:10px 0;padding:9px 11px;border-radius:9px;background:#fff4e0;border:1px solid #f0d29a;color:#7a4b00;font-size:13.5px;line-height:1.45;text-align:left">&#9888; <b>Nhập số điện thoại chính chủ có đăng ký Zalo.</b> Quyền sử dụng được xác minh qua Zalo theo số này; số không đúng chủ hoặc không có Zalo sẽ bị khóa.<label style="display:flex;gap:7px;align-items:flex-start;margin-top:7px;font-weight:600;cursor:pointer"><input type="checkbox" required style="width:auto;margin:2px 0 0;flex:none"> Tôi xác nhận đây là số chính chủ, có Zalo.</label></div><details class="paybox" id="pay_gate" open><summary>&#128275; Mở khóa ứng dụng – quét mã QR chuyển khoản</summary><p>Khi hết thời gian dùng thử hoặc hết hạn, anh/chị chuyển khoản theo mã QR dưới đây. <b>Nội dung chuyển khoản: ghi đúng số điện thoại đăng ký mở khóa</b> (ví dụ: 0813631111).</p><div class="payqr" role="img" aria-label="Mã QR chuyển khoản TPBank"></div><p class="acc">TPBank · <b>1135 7999 999</b> · LUONG VAN CHUNG</p><p>Sau khi chuyển khoản, ứng dụng được mở khóa theo số điện thoại đó. Cần hỗ trợ: Zalo 081.363.1111 (Lương Văn Chung).</p></details>
     <button type="submit" id="gb">Dùng ngay</button>
     <div class="gmsg" id="gm" role="status"></div>
     <div class="gfoot">Cần gia hạn hoặc hỗ trợ? Liên hệ Lương Văn Chung – 081.363.1111.</div>

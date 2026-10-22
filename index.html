@@ -10,42 +10,8 @@ if(!q&&h){var pg=h[2]||""; q=h[1]==="1"?(pg===""?"pb":pg==="dongtien"?"pbdongtie
 if(q==="dongtien") q="pbdongtien";
 if(K.indexOf(q)>=0) location.replace("./"+q+".html");})();
 </script>
-<script>
-/* ===== Bản đặt trên GitHub Pages: thay google.script.run bằng gọi máy chủ Apps Script qua JSONP =====
-   Trang chạy thẳng trên congthongtinbds.github.io (không qua khung Google) nên không có dải cảnh báo
-   và không bị lỗi "không thể mở tệp" khi trình duyệt đăng nhập nhiều tài khoản Google. */
-(function(){
-var SV="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec", P1="AKfycbywAdmP2T72-qYtLfUoaBnQpxfNhr_r3zxNEzh-pcIkuDU9xPyjyP09KwkP_ILUR3ufkA";
-function jsonp(q){return new Promise(function(ok,no){
-  var cb="gh"+Date.now()+Math.floor(Math.random()*1e6), s=document.createElement("script"), to=setTimeout(function(){end();no(new Error("NET"));},20000);
-  function end(){try{delete window[cb];}catch(e){} s.remove(); clearTimeout(to);}
-  window[cb]=function(r){end();ok(r);}; s.onerror=function(){end();no(new Error("NET"));};
-  var u=SV+"?callback="+cb+"&t="+Date.now(); for(var k in q) u+="&"+k+"="+encodeURIComponent(q[k]);
-  s.src=u; (document.head||document.documentElement).appendChild(s);});}
-var CALL={
-  kichHoat:function(phone,device){return jsonp({phone:phone,device:device});},
-  xinXuatPdf:function(phone){return jsonp({action:"pdf",phone:phone});},
-  dsAnh:function(d){return jsonp({action:"anh",du_an:d}).then(function(r){return (r&&r.anh)||{};});},
-  urlApp:function(){return Promise.resolve(null);}
-};
-function runner(s,f){return new Proxy({},{get:function(_,n){
-  if(n==="withSuccessHandler") return function(h){return runner(h,f);};
-  if(n==="withFailureHandler") return function(h){return runner(s,h);};
-  if(n==="withUserObject") return function(){return runner(s,f);};
-  if(!CALL[n]) return undefined;
-  return function(){CALL[n].apply(null,arguments).then(function(r){if(s)s(r);},function(e){if(f)f(e);});};}});}
-var Q={}; (location.search||"").replace(/^\?/,"").split("&").forEach(function(x){if(!x)return;var i=x.indexOf("=");Q[decodeURIComponent(i<0?x:x.slice(0,i))]=i<0?"":decodeURIComponent(x.slice(i+1));});
-window.google={script:{run:runner(null,null),url:{getLocation:function(cb){setTimeout(function(){cb({parameter:Q,hash:location.hash.replace(/^#/,"")});},0);}}}};
-// link sang trang khác của ứng dụng (dạng script.google.com/...?page=x) → trang tương ứng trên GitHub (x.html)
-function keyOf(h){var m=h.match(/^https:\/\/script\.google\.com\/macros\/s\/([\w-]+)\/exec(?:\?(?:.*&)?page=([\w-]*))?/); if(!m) return null;
-  var pg=m[2]||""; if(m[1]===P1){ if(!pg) return "pb"; if(pg==="dongtien") return "pbdongtien"; } return pg||"app";}
-function fix(a){var h=a.getAttribute("href")||""; if(h.indexOf("https://script.google.com/macros/s/")!==0) return; var k=keyOf(h); if(!k) return;
-  a.setAttribute("href",k==="app"?"./":"./"+k+".html"); a.removeAttribute("target");}
-function fixAll(){var L=document.querySelectorAll("a[href]"); for(var i=0;i<L.length;i++) fix(L[i]);}
-document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fixAll,1000); setTimeout(fixAll,4000);});
-["click","contextmenu","mousedown","touchstart","focusin","mouseover"].forEach(function(ev){document.addEventListener(ev,function(e){var a=e.target&&e.target.closest?e.target.closest("a[href]"):null; if(a) fix(a);},true);});
-})();
-</script>
+<script>window.__GH_SV="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec";</script>
+<script src="gh.js?v=3"></script>
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
