@@ -19,35 +19,55 @@ iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#fff}
 <iframe id="app" title="Tra cứu thông tin dự án bất động sản" allow="clipboard-write; fullscreen; web-share" referrerpolicy="strict-origin-when-cross-origin"></iframe>
 <script>
 /* Khung mở ứng dụng Apps Script để không hiện dải cảnh báo "Ứng dụng này do một người dùng Google Apps Script tạo".
-   Địa chỉ trang: .../#2/app (trang chọn dự án), #2/sf, #1/ab, #1 (Prima Bay)... */
+   Thanh địa chỉ luôn giữ link gốc (không thêm ký tự phía sau) – sao chép link lúc nào cũng ra link gốc.
+   Link mở thẳng một dự án: thêm ?mã trang, ví dụ .../HL/?sf (Sun Festo), .../HL/?scdongtien (Dòng tiền Sun Centro). */
 var P = {
   "1": "https://script.google.com/macros/s/AKfycbywAdmP2T72-qYtLfUoaBnQpxfNhr_r3zxNEzh-pcIkuDU9xPyjyP09KwkP_ILUR3ufkA/exec",
   "2": "https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec"
 };
+// mã trang → [dự án Apps Script, tham số page]
+var PAGES = {
+  app:["2","app"], sf:["2","sf"], sfdongtien:["2","sfdongtien"], ih:["2","ih"], ihdongtien:["2","ihdongtien"],
+  sc:["2","sc"], scdongtien:["2","scdongtien"], sb:["2","sb"], sbdongtien:["2","sbdongtien"], lm:["2","lm"], lmdongtien:["2","lmdongtien"],
+  pb:["1",""], dongtien:["1","dongtien"], pbdongtien:["1","dongtien"], hlx:["1","hlx"], hlxdongtien:["1","hlxdongtien"], ab:["1","ab"], abdongtien:["1","abdongtien"]
+};
 var fr = document.getElementById("app");
-function fromHash() {
-  var h = (location.hash || "").replace(/^#\/?/, ""), m = h.match(/^([12])(?:\/([\w-]*))?$/);
-  if (!m) return P["2"] + "?page=app";
-  return P[m[1]] + (m[2] ? "?page=" + encodeURIComponent(m[2]) : "");
-}
-function toHash(url) {
+var BASE = location.pathname;   // link gốc, không có ?… hay #…
+var SELF = location.origin + BASE;   // địa chỉ trang khung: app dùng để hiện link dạng .../HL/?sf khi sao chép
+function urlOf(key) { var p = PAGES[key] || PAGES.app; return P[p[0]] + "?" + (p[1] ? "page=" + p[1] + "&" : "") + "khung=" + encodeURIComponent(SELF); }
+function keyOfUrl(url) {
   for (var k in P) if (url.indexOf(P[k]) === 0) {
     var pg = (url.match(/[?&]page=([\w-]+)/) || [])[1] || "";
-    return "#" + k + (pg ? "/" + pg : "");
+    for (var key in PAGES) if (PAGES[key][0] === k && PAGES[key][1] === pg) return key;
   }
   return null;
 }
-function open_(url) { fr.src = url; }
+function startKey() {
+  var q = (location.search || "").replace(/^\?/, "").split("&")[0].replace(/^(p|page)=/, "").toLowerCase();
+  if (PAGES[q]) return q;
+  var h = (location.hash || "").replace(/^#\/?/, "").match(/^([12])(?:\/([\w-]*))?$/);   // link cũ dạng #2/sf
+  if (h) { var k = keyOfUrl(P[h[1]] + (h[2] ? "?page=" + h[2] : "")); if (k) return k; }
+  return "app";
+}
+var started = false;
+function show(key) {   // thay trang trong khung, không tạo thêm bước trong lịch sử trình duyệt
+  var u = urlOf(key);
+  if (!started) { started = true; fr.src = u; return; }
+  try { fr.contentWindow.location.replace(u); } catch (err) { fr.src = u; }
+}
 fr.addEventListener("load", function () { document.getElementById("wait").style.display = "none"; });
+// chuyển trang trong ứng dụng: mở trong khung, giữ nút Quay lại của trình duyệt, thanh địa chỉ vẫn là link gốc
 window.addEventListener("message", function (e) {
   var d = e.data;
   if (!d || d.khung !== "go" || typeof d.url !== "string") return;
-  var h = toHash(d.url);
-  if (!h) return;                       // chỉ mở các trang của 2 ứng dụng trên
-  if (location.hash === h) open_(fromHash()); else location.hash = h;
+  var key = keyOfUrl(d.url); if (!key) return;
+  try { history.pushState({ k: key }, "", BASE); } catch (err) {}
+  show(key);
 });
-window.addEventListener("hashchange", function () { open_(fromHash()); });
-open_(fromHash());
+window.addEventListener("popstate", function (e) { show(e.state && e.state.k ? e.state.k : "app"); });
+var k0 = startKey();
+try { history.replaceState({ k: k0 }, "", BASE); } catch (err) {}
+show(k0);
 </script>
 </body>
 </html>
