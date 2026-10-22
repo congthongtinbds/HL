@@ -433,6 +433,15 @@ count();
 // làm sạch nội dung: bỏ phần nội bộ
 function clean(body){
   const c=body.cloneNode(true);
+  // căn đã bán: thay ghi chú nội bộ bằng một dòng tình trạng cho khách
+  c.querySelectorAll("h3").forEach(h=>{if(![...h.querySelectorAll(".tag")].some(t=>/đã bán|đã cọc|đặt cọc/i.test(t.textContent))) return;
+    let n=h.nextElementSibling; while(n&&n.tagName!=="H3"){const nx=n.nextElementSibling; if(n.tagName==="P"&&/đã bán|đã cọc|đặt cọc/i.test(n.textContent)) n.remove(); n=nx;}
+    const p=document.createElement("p"); p.className="xp-sold"; p.innerHTML="<b>Tình trạng: căn đã bán.</b> Thông tin dưới đây để anh/chị tham khảo khi so sánh, lựa chọn căn tương tự."; h.after(p);});
+  // ảnh chỉ căn trong khối tài liệu căn (nội bộ): giữ lại ảnh để đưa vào PDF, bỏ phần ghi chú sàn
+  c.querySelectorAll(".udoc").forEach(u=>{const b=u.querySelector("b"), code=b?b.textContent.replace(/^Tài liệu căn\s+/,"").replace(/\s+theo bảng hàng.*$/,"").trim():"";
+    const ims=[...u.querySelectorAll('img[src^="data:"]')]; if(!ims.length) return;
+    ims.forEach(im=>{const f=document.createElement("figure"), i=document.createElement("img"), fc=document.createElement("figcaption");
+      i.src=im.getAttribute("src"); i.alt="Chỉ căn "+code; fc.textContent="Chỉ căn "+code; f.className="xp-cc"; f.appendChild(i); f.appendChild(fc); u.parentNode.insertBefore(f,u);});});
   c.querySelectorAll(".rel,.tools,.xp-bar,.udoc,button,script").forEach(e=>e.remove());
   c.querySelectorAll(".tag").forEach(t=>{if(t.classList.contains("bh")||INTERNAL.test(t.textContent)||/đã bán|đã cọc/i.test(t.textContent)) t.remove();});
   c.querySelectorAll("table").forEach(tb=>{
