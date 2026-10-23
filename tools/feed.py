@@ -193,7 +193,7 @@ def salepro(pid,sub):
     out=[];seen=set()
     for r in rows:
         if sub and norm(r.get('subdivision_name')).upper()!=sub: continue
-        if r.get('state_line')!='available' or r.get('is_not_show') or r.get('state')!='public': continue
+        st_='' if (r.get('state_line')=='available' and not r.get('is_not_show') and r.get('state')=='public') else ('sold' if (r.get('state_line')=='sold' or 'bán' in norm(r.get('state_line_name')).lower()) else 'off')
         c=norm(r['product_code'])
         if c in seen: continue
         seen.add(c)
@@ -203,8 +203,23 @@ def salepro(pid,sub):
         out.append([c,tw,norm(r.get('number_of_floor')) or None,norm(r.get('apartment_axis_code')) or None,
             TYP.get(norm(r.get('apartment_type_name')).upper(),norm(r.get('apartment_type_name'))),
             num_(r.get('carpet_area')),num_(r.get('built_up_area')),norm(r.get('base_direction_name')),'',
-            pr(r.get('apartment_price')),norm(r.get('price_description')),QN.get(norm(r.get('fund_groups_sell_code')),norm(r.get('fund_groups_sell_code'))),pr(r.get('early_payment_price'))])
+            pr(r.get('apartment_price')),norm(r.get('price_description')),QN.get(norm(r.get('fund_groups_sell_code')),norm(r.get('fund_groups_sell_code'))),pr(r.get('early_payment_price')),st_])
+    out.sort(key=lambda x:x[13]!='')
     return {'n':n,'u':out}
+def sp_merge(new,old,day):
+    """Không xóa căn: căn đã từng có mà nay không còn trên SalePro -> 'off' (chưa mở bán / rút khỏi quỹ); ghi ngày đổi tình trạng."""
+    om={r[0]:r for r in (old or [])}; out=[]; seen=set()
+    for r in new:
+        st=r[13]; p=om.get(r[0]); od=(p[14] if p and len(p)>14 else '')
+        ost=(p[13] if p and len(p)>13 else '') if p else None
+        r=r[:14]+[od if (p is not None and ost==st) else (day if st else '')]
+        out.append(r); seen.add(r[0])
+    for c,p in om.items():
+        if c in seen: continue
+        p=list(p)+['']*(15-len(p))
+        if p[13]=='' : p[13]='off'; p[14]=day
+        out.append(p[:15])
+    return out
 def enc(obj,key):
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     iv=os.urandom(12); ct=AESGCM(base64.b64decode(key)).encrypt(iv,json.dumps(obj,ensure_ascii=False,separators=(',',':')).encode(),None)
@@ -242,6 +257,15 @@ def main():
                     res=dict(os_); res['stale']=1; res['msg']='Lần đọc gần nhất lỗi, đang dùng dữ liệu lúc '+str(os_.get('at')); recs=orec
                     per.setdefault(src['duan'],{'src':[],'u':[]})['src'].append(res); per[src['duan']]['u']+=recs; continue
         res['at']=now.strftime('%H:%M %d/%m/%Y')
+        if res['ok'] and src.get('full',True):
+            od=olds.setdefault(src['duan'],old_feed(src['duan']))
+            have={r['c'] for r in recs}; kept=0
+            for r in (od or {}).get('u',[]):
+                if r.get('k')!=src['k'] or r['c'] in have: continue
+                r=dict(r)
+                if not r.get('x'): r['x']=now.strftime('%d/%m/%Y')
+                r['s']='sold'; recs.append(r); have.add(r['c']); kept+=1
+            if kept: res['msg']=(res['msg']+'; ' if res['msg'] else '')+f'{kept} căn không còn trong bảng (giữ lại, ghi đã bán)'
         print(f"{src['k']:12} {res['n']:4} {res['msg']}",file=sys.stderr)
         d=per.setdefault(src['duan'],{'src':[],'u':[]})
         d['src'].append(res); d['u']+=recs
@@ -249,9 +273,11 @@ def main():
         d=per.setdefault(duan,{'src':[],'u':[]})
         try:
             r=salepro(pid,sub)
-            if not r['u']: raise Exception('không có căn đang mở bán')
-            d['sp']={'date':now.strftime('%d/%m/%Y'),'at':now.strftime('%H:%M %d/%m/%Y'),'u':r['u']}; d['spnew']=1
-            print(f"salepro_{duan:5} {len(r['u']):4} căn đang mở bán / {r['n']}",file=sys.stderr)
+            if not any(x[13]=='' for x in r['u']): raise Exception('không có căn đang mở bán')
+            od=olds.setdefault(duan,old_feed(duan)); osp=(od or {}).get('sp') or {}
+            u=sp_merge(r['u'],osp.get('u'),now.strftime('%d/%m/%Y'))
+            d['sp']={'date':now.strftime('%d/%m/%Y'),'at':now.strftime('%H:%M %d/%m/%Y'),'u':u}; d['spnew']=1
+            print(f"salepro_{duan:5} {sum(1 for x in u if x[13]==''):4} căn đang mở bán / {len(u)} căn lưu",file=sys.stderr)
         except Exception as e:
             od=olds.setdefault(duan,old_feed(duan))
             if od and od.get('sp'): d['sp']=od['sp']
