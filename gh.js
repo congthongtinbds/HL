@@ -89,3 +89,21 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
     e.preventDefault(); e.stopImmediatePropagation(); modal(b);
   },true);
 })();
+
+// Màn hình nhập số điện thoại: thu gọn hộp mã QR mở khóa, làm nổi dòng "dùng thử miễn phí", chữ gợi ý trong ô nhập
+(function(){
+  function fix(){
+    var g=document.getElementById("pay_gate"); if(g&&!g.dataset.ghFold){g.dataset.ghFold="1"; g.open=false;}
+    var f=document.getElementById("gf"); if(!f) return;
+    var p=f.querySelector("p");
+    if(p&&!p.dataset.ghFree&&/dùng thử miễn phí/.test(p.textContent)){
+      p.dataset.ghFree="1";
+      p.innerHTML='<span class="gh-free">Nhập số điện thoại để dùng thử miễn phí ngay</span><span class="gh-free-sub">Số đã được cấp quyền thì dùng theo thời hạn đã cấp.</span>';
+    }
+    var i=document.getElementById("gp"); if(i&&!i.placeholder) i.placeholder="Nhập số điện thoại để dùng miễn phí";
+  }
+  var st=document.createElement("style");
+  st.textContent=".gh-free{display:block;margin:2px 0 4px;padding:10px 12px;border-radius:10px;background:#e6f4ef;border:1px solid #9fd0bf;color:#0b4a3f;font-weight:700;font-size:16.5px;line-height:1.4;text-align:center}.gh-free-sub{display:block;font-size:13px;color:#5d7270}#gp::placeholder{color:#7d918e;font-size:15px;letter-spacing:0}";
+  (document.head||document.documentElement).appendChild(st);
+  if(document.readyState!=="loading") fix(); else document.addEventListener("DOMContentLoaded",fix);
+})();
