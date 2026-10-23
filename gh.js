@@ -45,11 +45,11 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
 // nút quay về trang chọn dự án (mọi trang trừ trang chủ)
 (function(){
   var p=location.pathname, home=/\/(index\.html)?$/.test(p); if(home) return;
-  var css=".gh-home{position:fixed;left:12px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:39;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home{display:none}}";
+  var css="body.gh-pad{padding-top:calc(44px + env(safe-area-inset-top))!important}.gh-home{position:fixed;left:10px;top:calc(8px + env(safe-area-inset-top));z-index:60;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home{display:none}body.gh-pad{padding-top:0!important}}";
   function put(){
     if(document.querySelector(".gh-home")) return;
     var st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
-    var a=document.createElement("a"); a.className="gh-home"; a.href="./"; a.innerHTML="&#8592; Các dự án"; a.title="Về trang chọn dự án";
+    var a=document.createElement("a"); a.className="gh-home"; a.href="./"; a.innerHTML="&#8592; Các dự án"; a.title="Về trang chọn dự án"; document.body.classList.add("gh-pad");
     document.body.appendChild(a);
   }
   if(document.body) put(); else document.addEventListener("DOMContentLoaded",put);
