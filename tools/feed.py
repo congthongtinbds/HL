@@ -168,7 +168,8 @@ def run_source(src,cache):
     return res,recs
 
 # ===== SalePro (API công khai, không cần đăng nhập): quỹ đang mở bán theo dự án =====
-SALEPRO={'pb':(1402,''),'ab':(1304,''),'ih':(1312,''),'sc':(1264,'SUN CENTRO TOWN'),'sb':(1361,'*'),'hlx':(1334,'*'),'ho':(1343,'*')}
+SALEPRO={'pb':(1402,''),'ab':(1304,''),'ih':(1312,''),'sc':(1264,'SUN CENTRO TOWN'),'sb':(1361,'*'),'hlx':(1334,'*'),'ho':(1343,'*'),
+  'dk':(594,'*'),'xi':(1322,''),'js':(1300,''),'ri':(181,'*'),'ga':(1324,'*'),'am':(1329,''),'fc':(1397,''),'ru':(1439,'*'),'cv':(1462,''),'np':(1408,'*')}
 SPB='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_data/'
 SPL='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_low_rise_data/'
 SPUA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36','Accept':'application/json, text/plain, */*','Referer':'https://salepro.com/'}
