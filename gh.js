@@ -54,3 +54,38 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
   }
   if(document.body) put(); else document.addEventListener("DOMContentLoaded",put);
 })();
+
+// Trình duyệt trong Zalo / Facebook trên Android không tải được file PDF (chặn tải file tạo trong trang):
+// khi bấm "Xuất PDF" thì gợi ý mở trang này bằng Chrome. Quyền sử dụng giữ nguyên vì máy được nhận diện theo cấu hình điện thoại.
+(function(){
+  var UA=navigator.userAgent||"";
+  if(!/Android/i.test(UA)) return;
+  var app=/Zalo/i.test(UA)?"Zalo":/FBAN|FBAV|FB_IAB|Messenger/i.test(UA)?"Facebook":/Instagram/i.test(UA)?"Instagram":/Line\//i.test(UA)?"Line":/; wv\)/.test(UA)?"ứng dụng":"";
+  if(!app) return;
+  var skip=false;
+  var url=location.href.split("#")[0];
+  var intent="intent://"+url.replace(/^https?:\/\//,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(url)+";end";
+  function modal(btn){
+    var old=document.querySelector(".gh-pdfm"); if(old) old.remove();
+    var st=document.getElementById("gh-pdfm-css");
+    if(!st){st=document.createElement("style");st.id="gh-pdfm-css";st.textContent=".gh-pdfm{position:fixed;inset:0;z-index:9999;background:rgba(10,20,22,.6);display:flex;align-items:flex-end;justify-content:center;padding:12px}.gh-pdfm .bx{background:#fff;color:#14292c;max-width:440px;width:100%;border-radius:16px;padding:18px 16px calc(16px + env(safe-area-inset-bottom));font:15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.25)}.gh-pdfm h3{margin:0 0 6px;font-size:17px}.gh-pdfm p{margin:6px 0}.gh-pdfm a,.gh-pdfm button{display:block;width:100%;box-sizing:border-box;text-align:center;margin-top:9px;padding:12px;border-radius:12px;font:600 15px system-ui,sans-serif;text-decoration:none;border:none;cursor:pointer}.gh-pdfm .go{background:#0e4f4b;color:#fff}.gh-pdfm .cp{background:#eef4f3;color:#0e4f4b}.gh-pdfm .no{background:none;color:#5b6f72;font-weight:500}.gh-pdfm small{display:block;color:#5b6f72;font-size:13px;margin-top:8px}";document.head.appendChild(st);}
+    var m=document.createElement("div"); m.className="gh-pdfm"; m.setAttribute("role","dialog");
+    m.innerHTML='<div class="bx"><h3>Mở bằng Chrome để tải file PDF</h3><p>Trình duyệt trong '+app+' không cho tải file PDF về máy. Anh/chị bấm nút dưới đây để mở trang này bằng Chrome, rồi bấm <b>Xuất PDF</b> lại.</p>'+
+      '<a class="go" href="'+intent+'">Mở bằng Chrome</a><button type="button" class="cp">Sao chép link trang</button>'+
+      '<small>Nếu nút không mở được: bấm dấu <b>⋮</b> (hoặc <b>…</b>) ở góc trên bên phải → <b>Mở bằng trình duyệt</b>. Trong Chrome nhập lại số điện thoại đã đăng ký để dùng tiếp (cùng một điện thoại thường không bị tính thêm máy).</small>'+
+      '<button type="button" class="no">Vẫn thử xuất trong '+app+'</button></div>';
+    document.body.appendChild(m);
+    m.addEventListener("click",function(e){if(e.target===m) m.remove();});
+    m.querySelector(".no").onclick=function(){m.remove(); skip=true; try{btn.click();}finally{skip=false;}};
+    var cp=m.querySelector(".cp");
+    cp.onclick=function(){var ok=function(){cp.textContent="Đã sao chép – dán vào Chrome";};
+      if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok,function(){prompt("Sao chép link:",url);});
+      else prompt("Sao chép link:",url);};
+  }
+  document.addEventListener("click",function(e){
+    if(skip) return;
+    var b=e.target&&e.target.closest?e.target.closest("button,a"):null; if(!b||b.closest(".gh-pdfm")) return;
+    if(!/Xuất PDF/i.test(b.textContent||"")) return;
+    e.preventDefault(); e.stopImmediatePropagation(); modal(b);
+  },true);
+})();
