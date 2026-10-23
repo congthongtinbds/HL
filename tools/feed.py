@@ -1,14 +1,34 @@
 #!/usr/bin/env python3
 """Đọc bảng hàng các sàn trên Google Drive → feed/<duan>.json (mã hóa AES-GCM bằng APP_KEY).
 Cấu hình nguồn lấy từ biến môi trường SOURCES (JSON) hoặc file sources.json. Chạy: python feed.py [--plain]"""
-import os,sys,re,io,csv,json,base64,unicodedata,urllib.request,datetime,hashlib
+import os,sys,re,io,csv,json,base64,unicodedata,urllib.request,urllib.parse,datetime,hashlib
 import openpyxl
 UA={'User-Agent':'Mozilla/5.0 feed-bot'}
+LOG=[]
+RELAY=os.environ.get('RELAY_URL',''); RTOK=os.environ.get('RELAY_TOKEN','')
 def get(url,tries=3):
+    if RELAY and ('docs.google.com' in url or 'drive.google.com' in url):
+        st,b=_get(RELAY+('&' if '?' in RELAY else '?')+'t='+urllib.parse.quote(RTOK)+'&u='+urllib.parse.quote(url,safe=''),tries)
+        if st==200:
+            try:
+                j=json.loads(b.decode('utf8'))
+                if j.get('ok'): return int(j.get('code',200)),base64.b64decode(j['b64'])
+                LOG.append(f"relay {j.get('code')} {url[:80]} {str(j.get('msg'))[:120]}")
+                if j.get('code') in (401,403,404): return int(j['code']),b''
+            except Exception as e: LOG.append(f'relay lỗi {e}')
+        else: LOG.append(f'relay {st} {url[:80]}')
+    return _get(url,tries)
+def _get(url,tries=3):
     for i in range(tries):
         try:
             with urllib.request.urlopen(urllib.request.Request(url,headers=UA),timeout=60) as r: return r.status,r.read()
-        except urllib.error.HTTPError as e: return e.code,b''
+        except urllib.error.HTTPError as e:
+            try: body=e.read()[:300]
+            except Exception: body=b''
+            LOG.append(f'{e.code} {url[:90]} {body[:160]!r}')
+            if e.code in (429,500,502,503) and i<tries-1:
+                import time; time.sleep(8*(i+1)); continue
+            return e.code,b''
         except Exception as e:
             if i==tries-1: return 0,str(e).encode()
 def norm(v): return re.sub(r'\s+',' ',str(v if v is not None else '')).strip()
@@ -112,8 +132,14 @@ def parse_sheet(rows,ws,src):
 def run_source(src,cache):
     fid=src['file']; res={'k':src['k'],'label':src['label'],'dv':src.get('dv',''),'ok':False,'n':0,'msg':''}
     if fid not in cache:
-        st,b=get(f'https://docs.google.com/spreadsheets/d/{fid}/export?format=xlsx')
-        cache[fid]=openpyxl.load_workbook(io.BytesIO(b),data_only=False) if st==200 and b[:2]==b'PK' else None
+        wb=None
+        for u in (f'https://docs.google.com/spreadsheets/d/{fid}/export?format=xlsx',f'https://drive.google.com/uc?export=download&id={fid}'):
+            st,b=get(u)
+            if st==200 and b[:2]==b'PK':
+                try: wb=openpyxl.load_workbook(io.BytesIO(b),data_only=False); break
+                except Exception as e: LOG.append(f'xlsx lỗi {e}')
+            else: LOG.append(f'{st} {u[:80]} {b[:120]!r}')
+        cache[fid]=wb
         cache[fid+'_sh']=sheets_of(fid)
     wb=cache[fid]; shs=cache[fid+'_sh']
     if wb is None: res['msg']='không tải được file (kiểm tra quyền chia sẻ)'; return res,[]
@@ -150,15 +176,35 @@ def main():
     key=os.environ.get('APP_KEY','')
     out_dir=os.environ.get('OUT','feed'); os.makedirs(out_dir,exist_ok=True)
     now=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=7)))
+    def old_feed(duan):
+        try:
+            o=json.load(open(os.path.join(out_dir,duan+'.json'),encoding='utf8'))
+            if 'd' in o: return o['d']
+            if key and 'e' in o:
+                from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+                raw=base64.b64decode(o['e']); return json.loads(AESGCM(base64.b64decode(key)).decrypt(raw[:12],raw[12:],None))
+        except Exception: return None
+    olds={}
     cache={}; per={}
     for src in cfg:
         res,recs=run_source(src,cache)
+        if not res['ok']:
+            od=olds.setdefault(src['duan'],old_feed(src['duan']))
+            if od:
+                os_=next((x for x in od.get('src',[]) if x['k']==src['k'] and x.get('ok')),None)
+                orec=[r for r in od.get('u',[]) if r.get('k')==src['k']]
+                if os_ and orec:
+                    print(f"{src['k']:12} lỗi lần này ({res['msg']}) – giữ dữ liệu lần trước {os_.get('at')}",file=sys.stderr)
+                    res=dict(os_); res['stale']=1; res['msg']='Lần đọc gần nhất lỗi, đang dùng dữ liệu lúc '+str(os_.get('at')); recs=orec
+                    per.setdefault(src['duan'],{'src':[],'u':[]})['src'].append(res); per[src['duan']]['u']+=recs; continue
         res['at']=now.strftime('%H:%M %d/%m/%Y')
         print(f"{src['k']:12} {res['n']:4} {res['msg']}",file=sys.stderr)
         d=per.setdefault(src['duan'],{'src':[],'u':[]})
         d['src'].append(res); d['u']+=recs
     status={}
     for duan,d in per.items():
+        if not any(x.get('ok') for x in d['src']) and os.path.exists(os.path.join(out_dir,duan+'.json')):
+            status[duan]='lỗi đọc – giữ file cũ'; continue
         body={'v':1,'at':now.strftime('%H:%M %d/%m/%Y'),'src':d['src'],'u':d['u']}
         h=hashlib.sha256(json.dumps({'src':[{k:v for k,v in s.items() if k!='at'} for s in d['src']],'u':d['u']},sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16]
         body['h']=h
@@ -170,4 +216,5 @@ def main():
         json.dump(data,open(p,'w',encoding='utf8'),ensure_ascii=False,separators=(',',':'))
         status[duan]='cập nhật'
     print(json.dumps(status,ensure_ascii=False),file=sys.stderr)
+    for l in LOG[:40]: print('LOG',l,file=sys.stderr)
 if __name__=='__main__': main()
