@@ -3,7 +3,7 @@
 <head>
 <script>
 /* link cũ: .../HL/?sf hoặc .../HL/#2/sf → trang sf.html */
-(function(){var K=["sf","sfdongtien","ih","ihdongtien","sc","scdongtien","sb","sbdongtien","lm","lmdongtien","pb","pbdongtien","dongtien","hlx","hlxdongtien","ab","abdongtien"];
+(function(){var K=["sf","sfdongtien","ih","ihdongtien","sc","scdongtien","sb","sbdongtien","lm","lmdongtien","pb","pbdongtien","dongtien","hlx","hlxdongtien","ab","abdongtien","ho","hodongtien","sk","skdongtien","se","nx"];
 var q=(location.search||"").replace(/^\?/,"").split("&")[0].replace(/^(p|page)=/,"").toLowerCase();
 var h=(location.hash||"").replace(/^#\/?/,"").match(/^([12])(?:\/([\w-]*))?$/);
 if(!q&&h){var pg=h[2]||""; q=h[1]==="1"?(pg===""?"pb":pg==="dongtien"?"pbdongtien":pg):(pg||"");}
@@ -67,7 +67,7 @@ details li{margin:4px 0}
 <header class="top">
   <div class="top-in">
     <h1>Tra cứu thông tin dự án bất động sản</h1>
-    <p>Hỏi đáp và bảng tính dòng tiền (xuất được file PDF) của 8 dự án căn hộ, nhà phố – chọn dự án để mở.</p>
+    <p>Hỏi đáp và bảng tính dòng tiền (xuất được file PDF) của 12 dự án căn hộ, nhà phố, biệt thự, nhà ở xã hội – chọn dự án để mở.</p>
     <div class="who"><div><b>Lương Văn Chung</b><span>Hỗ trợ kỹ thuật</span></div><a class="call" href="tel:0813631111">Gọi 081.363.1111</a></div>
   </div>
   <svg class="karst" viewBox="0 0 640 96" preserveAspectRatio="none" aria-hidden="true">
@@ -104,16 +104,20 @@ const PROJ=[
  ["Imperia Holiday","The Bayside Hạ Long · MIK Group","#6b4e8a","p2","ih","ihdongtien","Dòng tiền"],
  ["Prima Bay","Bãi Cháy, Hạ Long","#0f6f68","p1","","dongtien","Dòng tiền homestay"],
  ["Aria Bay","Hạ Long","#2f6a9a","p1","ab","abdongtien","Dòng tiền"],
- ["Vin Hạ Long Xanh","Vinhomes Global Gate Hạ Long","#3f7a2e","p1","hlx","hlxdongtien","Dòng tiền"]];
+ ["Vin Hạ Long Xanh","Vinhomes Global Gate Hạ Long","#3f7a2e","p1","hlx","hlxdongtien","Dòng tiền"],
+ ["Horizon Bay","Biệt thự liền kề, song lập · bán đảo 1, Halong Marina","#1f6f8b","p2","ho","hodongtien","Dòng tiền"],
+ ["SkyM","Căn hộ, shoplot · Halong Marina, Bãi Cháy","#b0582a","p2","sk","skdongtien","Dòng tiền"],
+ ["The Sea","Căn hộ tòa H56 · bán đảo 2, Halong Marina","#246b9e","p2","se","",""],
+ ["Marina Living (NOXH)","Nhà ở xã hội · Đa giác 3, Halong Marina","#5c7a2e","p2","nx","",""]];
 // số liệu bộ hỏi đáp: [chủ đề, cách hỏi, số câu hỏi tra được (ước tính: các cách hỏi + 5 dạng hỏi cho mỗi căn có dữ liệu)] – cập nhật 22/10/2026
-const STAT={"sc": [29, 228, 1600], "sb": [24, 203, 1500], "lm": [22, 193, 300], "sf": [28, 215, 600], "ih": [29, 228, 700], "": [68, 404, 2700], "ab": [31, 230, 1400], "hlx": [30, 236, 5300]};
+const STAT={"sc": [29, 228, 1600], "sb": [24, 203, 1500], "lm": [22, 193, 300], "sf": [28, 215, 600], "ih": [29, 228, 700], "": [68, 404, 2700], "ab": [31, 230, 1400], "hlx": [30, 236, 5300], "ho": [21, 128, 730], "sk": [20, 118, 480], "se": [7, 35, 85], "nx": [25, 140, 140]};
 const nf=n=>n.toLocaleString("vi-VN");
 const url=(base,page)=>base+(page?"?page="+page:"");
 const list=document.getElementById("list");
 list.innerHTML=PROJ.map(([n,w,c,p,qa,dt,dtl])=>{const b=p==="p1"?P1:P2;
   return `<section class="proj" style="--c:${c}" data-p="${p}"><h2>${n}</h2><div class="where">${w}</div>${STAT[qa]?`<div class="stat">Hỏi đáp: <b>${STAT[qa][0]}</b> chủ đề · <b>${nf(STAT[qa][1])}</b> cách hỏi · khoảng <b>${nf(STAT[qa][2])}</b> câu hỏi</div>`:""}<div class="acts">
-  <a class="btn qa" target="_top" data-page="${qa}" href="${url(b,qa)}">Hỏi đáp<small>mã căn, giá, vay</small></a>
-  <a class="btn" target="_top" data-page="${dt}" href="${url(b,dt)}">${dtl}<small>các đợt đóng tiền · xuất PDF</small></a></div></section>`;}).join("");
+  <a class="btn qa" target="_top" data-page="${qa}" href="${url(b,qa)}">Hỏi đáp<small>${qa==="nx"?"điều kiện, hồ sơ, vay":"mã căn, giá, vay"}</small></a>
+  ${dt?`<a class="btn" target="_top" data-page="${dt}" href="${url(b,dt)}">${dtl}<small>các đợt đóng tiền · xuất PDF</small></a>`:""}</div></section>`;}).join("");
 // trang này chạy trong dự án Apps Script 02: link của dự án 02 lấy đúng địa chỉ đang chạy
 if(window.google&&google.script&&google.script.run){google.script.run.withSuccessHandler(u=>{if(!u)return;
   document.querySelectorAll('.proj[data-p="p2"] a').forEach(a=>{a.href=url(u,a.dataset.page);});}).urlApp();}
