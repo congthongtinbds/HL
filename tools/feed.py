@@ -172,8 +172,13 @@ def enc(obj,key):
     return base64.b64encode(iv+ct).decode()
 def main():
     plain='--plain' in sys.argv
-    cfg=json.loads(os.environ['SOURCES']) if os.environ.get('SOURCES') else json.load(open(os.path.join(os.path.dirname(__file__),'sources.json'),encoding='utf8'))
     key=os.environ.get('APP_KEY','')
+    here=os.path.dirname(os.path.abspath(__file__)); encp=os.path.join(here,'sources.enc')
+    if key and os.path.exists(encp):
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+        raw=base64.b64decode(open(encp).read().strip()); cfg=json.loads(AESGCM(base64.b64decode(key)).decrypt(raw[:12],raw[12:],None))
+    elif os.environ.get('SOURCES'): cfg=json.loads(os.environ['SOURCES'])
+    else: cfg=json.load(open(os.path.join(here,'sources.json'),encoding='utf8'))
     out_dir=os.environ.get('OUT','feed'); os.makedirs(out_dir,exist_ok=True)
     now=datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=7)))
     def old_feed(duan):
