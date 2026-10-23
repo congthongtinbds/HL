@@ -19,7 +19,7 @@ function jsonp(q){
   }).catch(function(){clearTimeout(to); return viaScript(q);});
 }
 var CALL={
-  kichHoat:function(phone,device){return jsonp({phone:phone,device:device});},
+  kichHoat:function(phone,device){var role="";try{role=localStorage.getItem("pb_role")||"";}catch(e){} return jsonp({phone:phone,device:device,role:role});},
   xinXuatPdf:function(phone){return jsonp({action:"pdf",phone:phone});},
   dsAnh:function(d){return jsonp({action:"anh",du_an:d}).then(function(r){return (r&&r.anh)||{};});},
   urlApp:function(){return Promise.resolve(null);}
@@ -101,9 +101,21 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
       p.innerHTML='<span class="gh-free">Nhập số điện thoại để dùng thử miễn phí ngay</span><span class="gh-free-sub">Số đã được cấp quyền thì dùng theo thời hạn đã cấp.</span>';
     }
     var i=document.getElementById("gp"); if(i&&!i.placeholder) i.placeholder="Nhập số điện thoại để dùng miễn phí";
+    if(i&&!document.getElementById("gh_role")){
+      var saved=""; try{saved=localStorage.getItem("pb_role")||"";}catch(e){}
+      var r=document.createElement("fieldset"); r.id="gh_role"; r.className="gh-role";
+      r.innerHTML='<legend>Bạn là ai? <span>(bắt buộc)</span></legend><div class="gh-role-b">'+
+        '<label><input type="radio" name="gh_role" value="sales" required'+(saved==="sales"?" checked":"")+'><span>Tôi là Sales</span></label>'+
+        '<label><input type="radio" name="gh_role" value="ndt" required'+(saved==="ndt"?" checked":"")+'><span>Tôi là Nhà đầu tư</span></label></div>'+
+        '<small>Chọn đối tượng sử dụng để tìm đúng tài liệu bạn cần.</small><div class="gh-role-m" role="alert"></div>';
+      var z=document.getElementById("gzalo"); (z&&z.parentNode===f?z:i).insertAdjacentElement("afterend",r);
+      r.addEventListener("change",function(e){ if(e.target.name==="gh_role"){ try{localStorage.setItem("pb_role",e.target.value);}catch(x){} r.classList.remove("err"); r.querySelector(".gh-role-m").textContent=""; } });
+      f.addEventListener("submit",function(e){ if(!f.querySelector('input[name="gh_role"]:checked')){ e.preventDefault(); e.stopImmediatePropagation(); r.classList.add("err"); r.querySelector(".gh-role-m").textContent="Vui lòng chọn Tôi là Sales hoặc Tôi là Nhà đầu tư."; r.scrollIntoView({block:"center",behavior:"smooth"}); } },true);
+      var gb=document.getElementById("gb"); if(gb) gb.addEventListener("click",function(e){ if(!f.querySelector('input[name="gh_role"]:checked')){ e.preventDefault(); e.stopImmediatePropagation(); r.classList.add("err"); r.querySelector(".gh-role-m").textContent="Vui lòng chọn Tôi là Sales hoặc Tôi là Nhà đầu tư."; } },true);
+    }
   }
   var st=document.createElement("style");
-  st.textContent=".gh-free{display:block;margin:2px 0 4px;padding:10px 12px;border-radius:10px;background:#e6f4ef;border:1px solid #9fd0bf;color:#0b4a3f;font-weight:700;font-size:16.5px;line-height:1.4;text-align:center}.gh-free-sub{display:block;font-size:13px;color:#5d7270}#gp::placeholder{color:#7d918e;font-size:15px;letter-spacing:0}";
+  st.textContent=".gh-free{display:block;margin:2px 0 4px;padding:10px 12px;border-radius:10px;background:#e6f4ef;border:1px solid #9fd0bf;color:#0b4a3f;font-weight:700;font-size:16.5px;line-height:1.4;text-align:center}.gh-free-sub{display:block;font-size:13px;color:#5d7270}#gp::placeholder{color:#7d918e;font-size:15px;letter-spacing:0}.gh-role{border:0;margin:12px 0 4px;padding:0;text-align:left}.gh-role legend{font-weight:700;font-size:14.5px;margin-bottom:6px;padding:0}.gh-role legend span{font-weight:400;color:#8a5a00;font-size:12.5px}.gh-role-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gh-role-b label{display:block;margin:0;cursor:pointer}.gh-role-b input{position:absolute;opacity:0;width:1px;height:1px}.gh-role-b span{display:block;text-align:center;padding:11px 6px;border:2px solid #b9c9c5;border-radius:11px;font-weight:700;font-size:15px;color:#24433f;background:#fff}.gh-role-b input:checked+span{background:#0e5f57;border-color:#0e5f57;color:#fff}.gh-role-b input:focus-visible+span{outline:3px solid #9fd0bf}.gh-role small{display:block;margin-top:6px;color:#5d7270;font-size:12.5px}.gh-role.err .gh-role-b span{border-color:#c0392b}.gh-role-m{color:#c0392b;font-size:13px;font-weight:600;margin-top:4px}";
   (document.head||document.documentElement).appendChild(st);
   if(document.readyState!=="loading") fix(); else document.addEventListener("DOMContentLoaded",fix);
 })();
