@@ -166,6 +166,45 @@ def run_source(src,cache):
     for r in recs: r['k']=src['k']
     res.update(ok=bool(recs),n=len(recs),msg='; '.join(msgs),sheets=[n for n,_ in want])
     return res,recs
+
+# ===== SalePro (API công khai, không cần đăng nhập): quỹ đang mở bán theo dự án =====
+SALEPRO={'pb':(1402,''),'ab':(1304,''),'ih':(1312,''),'sc':(1264,'SUN CENTRO TOWN'),'sb':(1361,'*')}
+SPB='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_data/'
+SPL='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_low_rise_data/'
+SPUA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36','Accept':'application/json, text/plain, */*','Referer':'https://salepro.com/'}
+TYP={'STUDIO':'ST','STUDIO+':'ST+','1 PHÒNG NGỦ':'1BR','1 PHÒNG NGỦ +':'1BR+','2 PHÒNG NGỦ':'2BR','2 PHÒNG NGỦ +':'2BR+','3 PHÒNG NGỦ':'3BR','3 PHÒNG NGỦ +':'3BR+','4 PHÒNG NGỦ':'4BR'}
+QN={'QC':'Quỹ chéo'}
+def _spget(q,low=False):
+    for i in range(3):
+        try:
+            with urllib.request.urlopen(urllib.request.Request((SPL if low else SPB)+'?'+q,headers=SPUA),timeout=60) as r: return json.loads(r.read().decode('utf8')).get('data') or []
+        except Exception as e:
+            err=e
+            import time; time.sleep(3*(i+1))
+    raise err
+def salepro(pid,sub):
+    import math
+    low=sub=='*'; sub='' if low else sub
+    d=_spget(f'project_id={pid}&page=1',low); n=int(d[0]['total_records']) if d else 0
+    rows=list(d)
+    for p in range(2,math.ceil(n/24)+1): rows+=_spget(f'project_id={pid}&page={p}',low)
+    codes={r['product_code'] for r in rows}
+    if n and len(codes)<n*0.9: raise Exception(f'thiếu dữ liệu {len(codes)}/{n}')
+    out=[];seen=set()
+    for r in rows:
+        if sub and norm(r.get('subdivision_name')).upper()!=sub: continue
+        if r.get('state_line')!='available' or r.get('is_not_show') or r.get('state')!='public': continue
+        c=norm(r['product_code'])
+        if c in seen: continue
+        seen.add(c)
+        num_=lambda v:(round(float(v),2) if v not in (None,'') and float(v)>0 else None)
+        pr=lambda v:(int(round(float(v))) if v not in (None,'') and float(v)>1000 else None)
+        tw=(norm(r['product_code']).split('.')[0] if low else re.sub(r'^To[àa]\s*','',norm(r.get('building_name')),flags=re.I)) or None
+        out.append([c,tw,norm(r.get('number_of_floor')) or None,norm(r.get('apartment_axis_code')) or None,
+            TYP.get(norm(r.get('apartment_type_name')).upper(),norm(r.get('apartment_type_name'))),
+            num_(r.get('carpet_area')),num_(r.get('built_up_area')),norm(r.get('base_direction_name')),'',
+            pr(r.get('apartment_price')),norm(r.get('price_description')),QN.get(norm(r.get('fund_groups_sell_code')),norm(r.get('fund_groups_sell_code'))),pr(r.get('early_payment_price'))])
+    return {'n':n,'u':out}
 def enc(obj,key):
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     iv=os.urandom(12); ct=AESGCM(base64.b64decode(key)).encrypt(iv,json.dumps(obj,ensure_ascii=False,separators=(',',':')).encode(),None)
@@ -206,12 +245,24 @@ def main():
         print(f"{src['k']:12} {res['n']:4} {res['msg']}",file=sys.stderr)
         d=per.setdefault(src['duan'],{'src':[],'u':[]})
         d['src'].append(res); d['u']+=recs
+    for duan,(pid,sub) in SALEPRO.items():
+        d=per.setdefault(duan,{'src':[],'u':[]})
+        try:
+            r=salepro(pid,sub)
+            if not r['u']: raise Exception('không có căn đang mở bán')
+            d['sp']={'date':now.strftime('%d/%m/%Y'),'at':now.strftime('%H:%M %d/%m/%Y'),'u':r['u']}; d['spnew']=1
+            print(f"salepro_{duan:5} {len(r['u']):4} căn đang mở bán / {r['n']}",file=sys.stderr)
+        except Exception as e:
+            od=olds.setdefault(duan,old_feed(duan))
+            if od and od.get('sp'): d['sp']=od['sp']
+            print(f"salepro_{duan:5} lỗi {str(e)[:160]} – {'giữ bản cũ' if d.get('sp') else 'chưa có dữ liệu'}",file=sys.stderr)
     status={}
     for duan,d in per.items():
-        if not any(x.get('ok') for x in d['src']) and os.path.exists(os.path.join(out_dir,duan+'.json')):
+        if not any(x.get('ok') for x in d['src']) and not d.get('spnew') and os.path.exists(os.path.join(out_dir,duan+'.json')):
             status[duan]='lỗi đọc – giữ file cũ'; continue
         body={'v':1,'at':now.strftime('%H:%M %d/%m/%Y'),'src':d['src'],'u':d['u']}
-        h=hashlib.sha256(json.dumps({'src':[{k:v for k,v in s.items() if k!='at'} for s in d['src']],'u':d['u']},sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16]
+        if d.get('sp'): body['sp']=d['sp']
+        h=hashlib.sha256(json.dumps({'src':[{k:v for k,v in s.items() if k!='at'} for s in d['src']],'u':d['u'],'sp':(d.get('sp') or {}).get('u')},sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16]
         body['h']=h
         p=os.path.join(out_dir,duan+'.json')
         try: old=json.load(open(p))
