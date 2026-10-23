@@ -67,7 +67,7 @@ details li{margin:4px 0}
 <header class="top">
   <div class="top-in">
     <h1>Tra cứu thông tin dự án bất động sản</h1>
-    <p>Hỏi đáp và bảng tính dòng tiền (xuất được file PDF) của 12 dự án căn hộ, nhà phố, biệt thự, nhà ở xã hội – chọn dự án để mở.</p>
+    <p>Hỏi đáp và bảng tính dòng tiền (xuất được file PDF) của 23 dự án căn hộ, nhà phố, biệt thự, nhà ở xã hội tại Quảng Ninh, Hải Phòng – chọn dự án để mở.</p>
     <div class="who"><div><b>Lương Văn Chung</b><span>Hỗ trợ kỹ thuật</span></div><a class="call" href="tel:0813631111">Gọi 081.363.1111</a></div>
   </div>
   <svg class="karst" viewBox="0 0 640 96" preserveAspectRatio="none" aria-hidden="true">
@@ -108,9 +108,20 @@ const PROJ=[
  ["Horizon Bay","Biệt thự liền kề, song lập · bán đảo 1, Halong Marina","#1f6f8b","p2","ho","hodongtien","Dòng tiền"],
  ["SkyM","Căn hộ, shoplot · Halong Marina, Bãi Cháy","#b0582a","p2","sk","skdongtien","Dòng tiền"],
  ["The Sea","Căn hộ tòa H56 · bán đảo 2, Halong Marina","#246b9e","p2","se","",""],
- ["Marina Living (NOXH)","Nhà ở xã hội · Đa giác 3, Halong Marina","#5c7a2e","p2","nx","",""]];
-// số liệu bộ hỏi đáp: [chủ đề, cách hỏi, số câu hỏi tra được (ước tính: các cách hỏi + 5 dạng hỏi cho mỗi căn có dữ liệu)] – cập nhật 22/10/2026
-const STAT={"sc": [29, 228, 1600], "sb": [24, 203, 1500], "lm": [22, 193, 300], "sf": [28, 215, 600], "ih": [29, 228, 700], "": [68, 404, 2700], "ab": [31, 230, 1400], "hlx": [30, 236, 5300], "ho": [21, 128, 730], "sk": [20, 118, 480], "se": [7, 35, 85], "nx": [25, 140, 140]};
+ ["Marina Living (NOXH)","Nhà ở xã hội · Đa giác 3, Halong Marina","#5c7a2e","p2","nx","",""],
+ ["Vinhomes Golden City","Liền kề, shophouse, biệt thự · Dương Kinh, Hải Phòng","#7a3b2e","p2","dk","",""],
+ ["Xanh Island","Căn hộ The Xanh Sky · trung tâm Cát Bà, Hải Phòng","#1f7a6b","p2","xi","",""],
+ ["Emerald Symphony","Liền kề DOJI · Hoa Động, Thủy Nguyên, Hải Phòng","#2d6b45","p2","es","",""],
+ ["Vinhomes Royal Island","Thấp tầng · đảo Vũ Yên, Hải Phòng","#6a4a8c","p2","ri","",""],
+ ["Flamingo Cát Bà","Căn hộ nghỉ dưỡng · bãi Cát Cò, Cát Bà","#c0504d","p2","fc","",""],
+ ["Ambience – Gamuda","Căn hộ · Võ Nguyên Giáp, Lê Chân, Hải Phòng","#3a6ea5","p2","am","",""],
+ ["Ramond Urbaniz","Nhà liền kề · Kiến Thụy, Hải Phòng","#8a6d1e","p2","ru","",""],
+ ["Vinhomes Golden Avenue","Liền kề, shophouse · Móng Cái, Quảng Ninh","#9a3d5c","p2","ga","",""],
+ ["Crystal Holidays Harbour","Căn hộ du lịch · Ao Tiên, Vân Đồn","#2f7f9e","p2","cv","",""],
+ ["Noble Palace Hạ Long","Shophouse, liền kề · Cao Xanh, Hạ Long","#5a6b2e","p2","np","",""],
+ ["Jade Square","Căn hộ · Tây Hồ Tây, Hà Nội","#4a7a3a","p2","js","",""]];
+// số liệu bộ hỏi đáp: [chủ đề, cách hỏi, số câu hỏi tra được (ước tính: các cách hỏi + 5 dạng hỏi cho mỗi căn có dữ liệu)] – cập nhật 24/10/2026
+const STAT={"sc": [29, 228, 1600], "sb": [24, 203, 1500], "lm": [22, 193, 300], "sf": [28, 215, 600], "ih": [29, 228, 700], "": [68, 404, 2700], "ab": [31, 230, 1400], "hlx": [30, 236, 5300], "ho": [21, 128, 730], "sk": [20, 118, 480], "se": [7, 35, 85], "nx": [25, 140, 140], "dk": [11, 61, 3351], "xi": [10, 52, 617], "es": [12, 53, 1268], "ri": [7, 35, 785], "fc": [7, 35, 695], "am": [7, 35, 270], "ru": [7, 35, 190], "ga": [7, 35, 140], "cv": [7, 35, 45], "np": [7, 35, 40], "js": [9, 40, 90]};
 const nf=n=>n.toLocaleString("vi-VN");
 const url=(base,page)=>base+(page?"?page="+page:"");
 const list=document.getElementById("list");
