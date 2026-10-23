@@ -119,3 +119,31 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
   (document.head||document.documentElement).appendChild(st);
   if(document.readyState!=="loading") fix(); else document.addEventListener("DOMContentLoaded",fix);
 })();
+
+// Lịch sử tra cứu: ghi lại câu hỏi của tài khoản đã kích hoạt (gom nhiều câu, gửi về Sheet của máy chủ dự án 02)
+(function(){
+  var SV2="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec", QK="pb_qlog";
+  function lic(){try{return JSON.parse(localStorage.getItem("pb_qa_lic")||"null")||{};}catch(e){return {};}}
+  function load(){try{return JSON.parse(localStorage.getItem(QK)||"[]")||[];}catch(e){return [];}}
+  function save(a){try{localStorage.setItem(QK,JSON.stringify(a.slice(-200)));}catch(e){}}
+  var app=(document.title||"").replace(/\s*Hỏi Đáp\s*$/,"").trim()||location.pathname.split("/").pop();
+  function add(q){q=String(q||"").replace(/\s+/g," ").trim(); if(!q) return; var a=load(); a.push([Date.now(),app,q.slice(0,300)]); save(a); if(a.length>=5) flush();}
+  var busy=false;
+  function flush(){
+    var L=lic(); if(busy||!L.phone) return; var a=load(); if(!a.length) return;
+    var part=[], len=0; for(var i=0;i<a.length&&part.length<20;i++){var s=JSON.stringify(a[i]); if(len+s.length>1400) break; part.push(a[i]); len+=s.length;}
+    var role=""; try{role=localStorage.getItem("pb_role")||"";}catch(e){}
+    var cb="ghl"+Date.now(), u=SV2+"?callback="+cb+"&action=log&phone="+encodeURIComponent(L.phone)+"&role="+encodeURIComponent(role)+"&d="+encodeURIComponent(JSON.stringify(part));
+    busy=true;
+    var done=function(ok){busy=false; if(ok){var b=load(); save(b.slice(part.length)); if(b.length-part.length>0) setTimeout(flush,1500);}};
+    if(window.fetch) fetch(u,{credentials:"omit"}).then(function(r){return r.text();}).then(function(t){done(/"ok":\s*true/.test(t));}).catch(function(){done(false);});
+    else done(false);
+  }
+  function watch(){
+    var log=document.getElementById("log"); if(!log) return;
+    new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1&&n.classList&&n.classList.contains("q")) add(n.textContent);});});}).observe(log,{childList:true});
+    setInterval(flush,60000); setTimeout(flush,5000);
+    document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden") flush();});
+  }
+  if(document.readyState!=="loading") watch(); else document.addEventListener("DOMContentLoaded",watch);
+})();
