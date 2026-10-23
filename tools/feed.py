@@ -168,7 +168,7 @@ def run_source(src,cache):
     return res,recs
 
 # ===== SalePro (API công khai, không cần đăng nhập): quỹ đang mở bán theo dự án =====
-SALEPRO={'pb':(1402,''),'ab':(1304,''),'ih':(1312,''),'sc':(1264,'SUN CENTRO TOWN'),'sb':(1361,'*')}
+SALEPRO={'pb':(1402,''),'ab':(1304,''),'ih':(1312,''),'sc':(1264,'SUN CENTRO TOWN'),'sb':(1361,'*'),'hlx':(1334,'*'),'ho':(1343,'*')}
 SPB='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_data/'
 SPL='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_low_rise_data/'
 SPUA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36','Accept':'application/json, text/plain, */*','Referer':'https://salepro.com/'}
@@ -187,7 +187,9 @@ def salepro(pid,sub):
     low=sub=='*'; sub='' if low else sub
     d=_spget(f'project_id={pid}&page=1',low); n=int(d[0]['total_records']) if d else 0
     rows=list(d)
-    for p in range(2,math.ceil(n/24)+1): rows+=_spget(f'project_id={pid}&page={p}',low)
+    import concurrent.futures as cf
+    with cf.ThreadPoolExecutor(6) as ex:
+        for part in ex.map(lambda p:_spget(f'project_id={pid}&page={p}',low),range(2,math.ceil(n/24)+1)): rows+=part
     codes={r['product_code'] for r in rows}
     if n and len(codes)<n*0.9: raise Exception(f'thiếu dữ liệu {len(codes)}/{n}')
     out=[];seen=set()
@@ -199,7 +201,7 @@ def salepro(pid,sub):
         seen.add(c)
         num_=lambda v:(round(float(v),2) if v not in (None,'') and float(v)>0 else None)
         pr=lambda v:(int(round(float(v))) if v not in (None,'') and float(v)>1000 else None)
-        tw=(norm(r['product_code']).split('.')[0] if low else re.sub(r'^To[àa]\s*','',norm(r.get('building_name')),flags=re.I)) or None
+        tw=((lambda c:(c.split('.')[0] if '.' in c else c.rsplit('-',1)[0]))(norm(r['product_code'])) if low else re.sub(r'^To[àa]\s*','',norm(r.get('building_name')),flags=re.I)) or None
         out.append([c,tw,norm(r.get('number_of_floor')) or None,norm(r.get('apartment_axis_code')) or None,
             TYP.get(norm(r.get('apartment_type_name')).upper(),norm(r.get('apartment_type_name'))),
             num_(r.get('carpet_area')),num_(r.get('built_up_area')),norm(r.get('base_direction_name')),'',
