@@ -1,3 +1,18 @@
+/* ===== Giao diện luôn nền sáng (không theo chế độ tối của máy); trang hỏi đáp trên máy tính: cuộn theo trang, khung trả lời rộng ===== */
+(function(){
+  var r=document.documentElement; r.setAttribute("data-theme","light"); r.style.colorScheme="light";
+  try{var m=document.createElement("meta"); m.name="color-scheme"; m.content="light only"; (document.head||r).appendChild(m);}catch(e){}
+  var css="@media (min-width:761px){html,body{height:auto!important}"
+   +".app{display:block!important;height:auto!important;max-width:1480px!important}"
+   +".app .main{grid-template-columns:230px minmax(0,1fr)!important;align-items:start;gap:22px!important}"
+   +".app aside{position:sticky;top:12px;max-height:calc(100vh - 24px)!important;overflow:auto!important}"
+   +".app .conv{display:block!important;min-height:75vh}"
+   +".app .log{overflow:visible!important;min-height:70vh;padding:22px 26px!important;font-size:15.5px}"
+   +".app .a .body{padding:16px 22px!important}"
+   +".app form{position:sticky;bottom:0;z-index:5;background:var(--panel);border-radius:0 0 14px 14px;box-shadow:0 -8px 18px rgba(0,0,0,.06)}}";
+  var st=document.createElement("style"); st.textContent=css; (document.head||r).appendChild(st);
+})();
+
 /* ===== Bản đặt trên GitHub Pages: thay google.script.run bằng gọi máy chủ Apps Script qua JSONP =====
    Trang chạy thẳng trên congthongtinbds.github.io (không qua khung Google) nên không có dải cảnh báo
    và không bị lỗi "không thể mở tệp" khi trình duyệt đăng nhập nhiều tài khoản Google. */
@@ -45,7 +60,7 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
 // nút quay về trang chọn dự án (mọi trang trừ trang chủ)
 (function(){
   var p=location.pathname, home=/\/(index\.html)?$/.test(p); if(home) return;
-  var css="body.gh-pad{padding-top:calc(44px + env(safe-area-inset-top))!important}.gh-bar{position:fixed;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));z-index:60;display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:8px;align-items:center;pointer-events:none;padding-bottom:4px}.gh-bar::-webkit-scrollbar{display:none}.gh-bar>*{flex:none;white-space:nowrap}@media (max-width:480px){.gh-bar{gap:6px}.gh-bar .gh-home,.gh-bar .ptg-fab,.gh-bar .xp-fab{padding:7px 10px!important;font-size:12.5px!important}}.gh-bar>*{pointer-events:auto}.gh-bar .ptg-fab,.gh-bar .xp-fab{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;padding:7px 13px!important;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif!important;box-shadow:0 4px 14px rgba(0,0,0,.2)!important;margin:0!important}.gh-bar [hidden]{display:none!important}.gh-home{position:static;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home,.gh-bar{display:none}body.gh-pad{padding-top:0!important}}";
+  var css="body.gh-pad{padding-top:calc(44px + env(safe-area-inset-top))!important}.gh-bar{position:absolute;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));z-index:60;display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:8px;align-items:center;pointer-events:none;padding-bottom:4px}.gh-bar::-webkit-scrollbar{display:none}.gh-bar>*{flex:none;white-space:nowrap}@media (max-width:480px){.gh-bar{gap:6px}.gh-bar .gh-home,.gh-bar .ptg-fab,.gh-bar .xp-fab{padding:7px 10px!important;font-size:12.5px!important}}.gh-bar>*{pointer-events:auto}.gh-bar .ptg-fab,.gh-bar .xp-fab{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;padding:7px 13px!important;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif!important;box-shadow:0 4px 14px rgba(0,0,0,.2)!important;margin:0!important}.gh-bar [hidden]{display:none!important}.gh-home{position:static;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home,.gh-bar{display:none}body.gh-pad{padding-top:0!important}}";
   function put(){
     if(document.querySelector(".gh-bar")) return;
     var st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
