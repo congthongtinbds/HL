@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
      +(L.phone?'':'<p class="uq-msg err">Cần kích hoạt ứng dụng bằng số điện thoại trước khi nhập quỹ căn.</p>')
      +'<p class="uq-note">Quỹ căn nhập ở đây được lưu vào hệ thống và hiện ngay trong ứng dụng của dự án này cho mọi người dùng (ghi rõ là do người dùng nhập). Cùng mã căn nhập lại thì lấy thông tin mới nhất.</p>'
      +'<div class="uq-tabs"><button type="button" data-t="one" aria-pressed="true">Nhập từng căn</button><button type="button" data-t="paste" aria-pressed="false">Dán từ Excel / Google Sheet</button></div>'
-     +'<div data-p="one"><div class="uq-grid" id="uq-f"></div><div class="uq-row" style="margin-top:10px"><button type="button" id="uq-addcol">+ Thêm cột</button><button type="button" id="uq-addrow">Thêm căn vào danh sách</button></div></div>'
+     +'<div data-p="one"><div class="uq-grid" id="uq-f"></div><div class="uq-row" style="margin-top:10px"><button type="button" id="uq-addcol">+ Thêm cột</button><button type="button" id="uq-addrow">Thêm căn khác (nhập nhiều căn)</button></div></div>'
      +'<div data-p="paste" hidden><p class="uq-note">Copy cả bảng trong Excel hoặc Google Sheet (gồm dòng tiêu đề) rồi dán vào ô dưới. Cột được nhận theo tên tiêu đề (Mã căn, Tòa, Tầng, Loại, Diện tích, Hướng, Giá…); cột lạ được giữ nguyên làm cột mới.</p><textarea id="uq-paste" placeholder="Mã căn&#9;Tòa&#9;Tầng&#9;Loại&#9;Diện tích&#9;Giá&#10;C22130&#9;C2&#9;21&#9;Studio&#9;30,2&#9;3,65 tỷ"></textarea><div class="uq-row" style="margin-top:8px"><button type="button" id="uq-parse">Đọc bảng</button></div></div>'
      +'<div><b style="font-size:13.5px">Danh sách sẽ lưu (<span id="uq-n">0</span> căn)</b><div class="uq-tw" style="margin-top:6px"><table id="uq-tb"></table></div></div>'
      +'<div class="uq-row"><button type="button" class="pri" id="uq-save">Lưu vào hệ thống</button><button type="button" id="uq-clear">Xóa danh sách</button><span class="uq-msg" id="uq-msg"></span></div>'
@@ -256,9 +256,10 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
     function msg(t,c){var m=$("#uq-msg"); m.textContent=t; m.className="uq-msg "+(c||"");}
     $("#uq-addcol").onclick=function(){var w=document.createElement("div"); w.className="uq-row"; w.innerHTML='<input id="uq-newcol" placeholder="Tên cột mới, ví dụ: Chính sách, Số phòng ngủ" style="flex:1;min-width:200px;border:1px solid #cfd8e0;border-radius:8px;padding:8px 10px;font:14px inherit"><button type="button" class="pri">Thêm</button>';
       this.parentNode.after(w); var inp=w.querySelector("input"); inp.focus(); w.querySelector("button").onclick=function(){var n=inp.value.trim(); if(n){var k="x:"+n.slice(0,30); if(!extra.some(function(x){return x[0]===k;})) extra.push([k,n.slice(0,30)]); var keep={}; ov.querySelectorAll("#uq-f [data-k]").forEach(function(i){keep[i.getAttribute("data-k")]=i.value;}); form(); ov.querySelectorAll("#uq-f [data-k]").forEach(function(i){if(keep[i.getAttribute("data-k")]!=null) i.value=keep[i.getAttribute("data-k")];});} w.remove();};};
+    function takeForm(quiet){var u={}; ov.querySelectorAll("#uq-f [data-k]").forEach(function(i){var v=i.value.trim(); if(v) u[i.getAttribute("data-k")]=v;}); u.c=String(u.c||"").toUpperCase().replace(/\s+/g,""); if(!u.c) return null; list=list.filter(function(x){return x.c!==u.c;}); list.push(u); ov.querySelectorAll("#uq-f input").forEach(function(i){ if(["c","tang","truc"].indexOf(i.getAttribute("data-k"))>=0) i.value=""; }); draw(); return u;}
     $("#uq-addrow").onclick=function(){var u={}; ov.querySelectorAll("#uq-f [data-k]").forEach(function(i){var v=i.value.trim(); if(v) u[i.getAttribute("data-k")]=v;});
       u.c=String(u.c||"").toUpperCase().replace(/\s+/g,""); if(!u.c){msg("Cần nhập mã căn.","err"); return;}
-      list=list.filter(function(x){return x.c!==u.c;}); list.push(u); draw(); msg("Đã thêm căn "+u.c+" vào danh sách. Bấm \"Lưu vào hệ thống\" để lưu.","ok");
+      list=list.filter(function(x){return x.c!==u.c;}); list.push(u); draw(); msg("Đã thêm căn "+u.c+". Nhập tiếp căn khác hoặc bấm \"Lưu vào hệ thống\".","ok");
       ov.querySelectorAll("#uq-f input").forEach(function(i){ if(["c","tang","truc"].indexOf(i.getAttribute("data-k"))>=0) i.value=""; }); var c0=$("#uq-f [data-k=c]"); if(c0) c0.focus();};
     $("#uq-parse").onclick=function(){var txt=$("#uq-paste").value.replace(/\r/g,"").trim(); if(!txt){msg("Chưa có dữ liệu để đọc.","err"); return;}
       var lines=txt.split("\n").filter(function(l){return l.trim();}); var sep=lines[0].indexOf("\t")>=0?"\t":(lines[0].indexOf(";")>=0?";":",");
@@ -267,7 +268,10 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
       var n=0; lines.slice(1).forEach(function(l){var v=l.split(sep), u={}; keys.forEach(function(k,i){var x=(v[i]||"").trim(); if(x&&!u[k]) u[k]=x;}); u.c=String(u.c||"").toUpperCase().replace(/\s+/g,""); if(!u.c) return; list=list.filter(function(x){return x.c!==u.c;}); list.push(u); n++;});
       draw(); form(); msg("Đã đọc "+n+" căn. Kiểm tra bảng rồi bấm \"Lưu vào hệ thống\".","ok");};
     $("#uq-clear").onclick=function(){list=[]; draw(); msg("");};
-    $("#uq-save").onclick=function(){var L=lic(); if(!L.phone){msg("Cần kích hoạt ứng dụng bằng số điện thoại trước.","err"); return;} if(!list.length){msg("Danh sách đang trống.","err"); return;}
+    $("#uq-save").onclick=function(){var L=lic(); if(!L.phone){msg("Cần kích hoạt ứng dụng bằng số điện thoại trước.","err"); return;}
+      var pv=$("#uq-paste"); if(!$("[data-p=paste]").hidden&&pv.value.trim()){ $("#uq-parse").click(); pv.value=""; }
+      var c0=$("#uq-f [data-k=c]"); if(c0&&c0.value.trim()) takeForm(true);
+      if(!list.length){msg("Chưa có căn nào: nhập mã căn hoặc dán bảng trước.","err"); return;}
       var btn=this; btn.disabled=true; var todo=list.slice(), done=0;
       function next(){ if(!todo.length){ msg("Đã lưu "+done+" căn. Ứng dụng đã cập nhật quỹ căn mới.","ok"); btn.disabled=false; var m={}; cached().forEach(function(u){m[u.c]=u;}); list.forEach(function(u){var x={}; for(var k in u) x[k]=u[k]; x.t=new Date().toLocaleString("vi-VN"); m[u.c]=x;}); cache(Object.keys(m).map(function(k){return m[k];})); list=[]; draw(); setTimeout(refresh,3000); return; }
         var part=[], len=0; while(todo.length&&part.length<15){var s=JSON.stringify(todo[0]); if(part.length&&len+s.length>1300) break; part.push(todo.shift()); len+=s.length;}
