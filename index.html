@@ -140,6 +140,7 @@ details ol{margin:8px 0 2px;padding-left:20px}
 @media (max-width:720px){.regions{position:static;backdrop-filter:none;-webkit-backdrop-filter:none}.regions .wrap{flex-wrap:wrap;overflow:visible}.rg{padding:7px 12px;font-size:13px}.foot{grid-template-columns:1fr}.contact small{display:none}.contact b{display:none}}
 @media (max-width:420px){.grid{grid-template-columns:1fr}.brand span{display:none}.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+.card{cursor:pointer}.card:hover{border-color:#9fb3d1}
 </style>
 </head>
 <body>
@@ -211,6 +212,7 @@ list.innerHTML=D.map((p,i)=>{
   <div class="top">${p.dv?`<div class="cdt ${p.t}" title="Chủ đầu tư: ${E(p.dv)}">${p.dc?`<img src="${BASE}img/cdt/${encodeURIComponent(p.dc.toLowerCase().replace(/[^a-z0-9]+/g,""))}.png" alt="${E(p.dv)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('b'),{textContent:this.alt,style:\'font-size:${fs(p.dv)}\'}))">`:`<b style="font-size:${fs(p.dv)}">${E(p.dv)}</b>`}</div>`:`<div class="tile ${p.t}" aria-hidden="true">${E(ini(p.n))}</div>`}<div><h3>${E(p.n)}</h3><p class="where">${E(w)}</p>${p.dv?`<p class="by">Chủ đầu tư: <b>${E(p.dv)}</b></p>`:""}</div></div>
   ${tags?`<div class="tags">${tags}</div>`:""}${st}
   <div class="acts"><a class="btn qa" href="${BASE}${E(p.k)}.html">${ICQ}Hỏi đáp</a>${p.dt?`<a class="btn dt" href="${BASE}${E(p.dt)}.html">${ICT}${E(p.dl||"Dòng tiền")}</a>`:""}</div></article>`;}).join("");
+list.addEventListener("click",e=>{if(e.target.closest("a,button")||(getSelection()+"").length>2)return;const c=e.target.closest(".card"),qa=c&&c.querySelector(".btn.qa");if(qa)location.href=qa.href;});
 const C=[...list.children], q=document.getElementById("fq"), bar=document.getElementById("flt");
 const key=D.map(p=>fold(p.n+" "+p.w+" "+(RN[p.r]||"")+" "+(p.dv||"")));
 const cnt=r=>D.filter(p=>!r||p.r===r).length;
