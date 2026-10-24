@@ -45,12 +45,19 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
 // nút quay về trang chọn dự án (mọi trang trừ trang chủ)
 (function(){
   var p=location.pathname, home=/\/(index\.html)?$/.test(p); if(home) return;
-  var css="body.gh-pad{padding-top:calc(44px + env(safe-area-inset-top))!important}.gh-home{position:fixed;left:10px;top:calc(8px + env(safe-area-inset-top));z-index:60;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home{display:none}body.gh-pad{padding-top:0!important}}";
+  var css="body.gh-pad{padding-top:calc(44px + env(safe-area-inset-top))!important}.gh-bar{position:fixed;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top));z-index:60;display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:8px;align-items:center;pointer-events:none;padding-bottom:4px}.gh-bar::-webkit-scrollbar{display:none}.gh-bar>*{flex:none;white-space:nowrap}@media (max-width:480px){.gh-bar{gap:6px}.gh-bar .gh-home,.gh-bar .ptg-fab,.gh-bar .xp-fab{padding:7px 10px!important;font-size:12.5px!important}}.gh-bar>*{pointer-events:auto}.gh-bar .ptg-fab,.gh-bar .xp-fab{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;padding:7px 13px!important;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif!important;box-shadow:0 4px 14px rgba(0,0,0,.2)!important;margin:0!important}.gh-bar [hidden]{display:none!important}.gh-home{position:static;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home,.gh-bar{display:none}body.gh-pad{padding-top:0!important}}";
   function put(){
-    if(document.querySelector(".gh-home")) return;
+    if(document.querySelector(".gh-bar")) return;
     var st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
+    var bar=document.createElement("div"); bar.className="gh-bar";
     var a=document.createElement("a"); a.className="gh-home"; a.href="./"; a.innerHTML="&#8592; Các dự án"; a.title="Về trang chọn dự án"; document.body.classList.add("gh-pad");
-    document.body.appendChild(a);
+    bar.appendChild(a); document.body.appendChild(bar);
+    /* nút Phiếu tính giá và Xuất PDF tư vấn đưa lên cùng hàng với nút Các dự án */
+    function grab(){ [".ptg-fab",".xp-fab"].forEach(function(q){ var b=document.querySelector(q); if(b&&b.parentNode!==bar) bar.appendChild(b); }); pad(); }
+    function pad(){ var h=bar.offsetHeight||36; document.body.style.setProperty("padding-top","calc("+(h+14)+"px + env(safe-area-inset-top))","important"); }
+    grab(); setTimeout(grab,300); setTimeout(grab,1500);
+    try{ new MutationObserver(grab).observe(document.body,{childList:true}); }catch(e){}
+    try{ new ResizeObserver(pad).observe(bar); }catch(e){ window.addEventListener("resize",pad); }
   }
   if(document.body) put(); else document.addEventListener("DOMContentLoaded",put);
 })();
