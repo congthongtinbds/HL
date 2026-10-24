@@ -170,7 +170,8 @@ def run_source(src,cache):
 # ===== SalePro (API công khai, không cần đăng nhập): quỹ đang mở bán theo dự án =====
 SALEPRO={'pb':(1402,''),'ab':(1304,''),'ih':(1312,''),'sc':(1264,'SUN CENTRO TOWN'),'sb':(1361,'*'),'hlx':(1334,'*'),'ho':(1343,'*'),
   'dk':(594,'*'),'xi':(1322,''),'js':(1300,''),'ri':(181,'*'),'ga':(1324,'*'),'am':(1329,''),'fc':(1397,''),'ru':(1439,'*'),'cv':(1462,''),'np':(1408,'*'),
-  'sr':(1417,''),'gc':(1291,''),'sg':(1392,'*'),'es':(1357,'*'),'hh':(1349,''),'se':(1380,'')}
+  'sr':(1417,''),'gc':(1291,''),'sg':(1392,'*'),'es':(1357,'*'),'hh':(1349,''),'se':(1380,''),
+  'p1344':(1344,''),'p1427':(1427,'*'),'p1448':(1448,''),'p1280':(1280,''),'p1411':(1411,'*'),'p1432':(1432,''),'p1409':(1409,'*'),'p1388':(1388,'*'),'p872':(872,'*'),'p1281':(1281,''),'p1382':(1382,'*'),'p1404':(1404,''),'p1351':(1351,'*'),'p1386':(1386,''),'p1371':(1371,'*'),'p466':(466,''),'p1341':(1341,''),'p1418':(1418,''),'p1412':(1412,'*'),'p1376':(1376,''),'p1279':(1279,''),'p1443':(1443,''),'p297':(297,''),'p102':(102,''),'p1276':(1276,''),'p1248':(1248,''),'p1446':(1446,'*'),'p1339':(1339,''),'p1431':(1431,''),'p1459':(1459,''),'p1464':(1464,'*'),'p1365':(1365,''),'p1358':(1358,''),'p1368':(1368,'*'),'p1375':(1375,'*'),'p1359':(1359,'*'),'p1414':(1414,'*'),'p1325':(1325,''),'p1469':(1469,''),'p1251':(1251,''),'p1395':(1395,''),'p1352':(1352,''),'p1450':(1450,'*'),'p1378':(1378,''),'p604':(604,''),'p1445':(1445,'*'),'p1287':(1287,''),'p1381':(1381,''),'p586':(586,''),'p1390':(1390,''),'p1419':(1419,'*'),'p1451':(1451,'*'),'p1425':(1425,''),'p1282':(1282,'*'),'p1350':(1350,'*'),'p1454':(1454,''),'p308':(308,'*'),'p92':(92,''),'p788':(788,'*'),'p465':(465,'*'),'p1461':(1461,'*'),'p1393':(1393,''),'p1261':(1261,'*'),'p1430':(1430,''),'p1321':(1321,''),'p1315':(1315,''),'p1463':(1463,'*'),'p1422':(1422,''),'p358':(358,''),'p1310':(1310,''),'p1330':(1330,''),'p533':(533,''),'p1292':(1292,''),'p1453':(1453,''),'p1265':(1265,'*'),'p87':(87,'*'),'p355':(355,'*')}
 SPB='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_data/'
 SPL='https://salepro.com/api/rest_api/pu/property/master/data/search_tindang_low_rise_data/'
 SPUA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36','Accept':'application/json, text/plain, */*','Referer':'https://salepro.com/'}
@@ -300,9 +301,14 @@ def landing(pid):
     o['desc']=_PH.sub('',o['desc']); seen=set(); o['facts']=[x for x in o['facts'] if not (x[0].lower() in seen or seen.add(x[0].lower()))]
     return o
 def run_landing(out_dir,key,now,plain=False):
-    st={}
+    import time as _tl; TL0=_tl.time(); st={}
     for duan,(pid,sub) in SALEPRO.items():
         p=os.path.join(out_dir,'land_'+duan+'.json')
+        try:
+            oa=json.load(open(p)).get('at','')
+            if (now.replace(tzinfo=None)-datetime.datetime.strptime(oa,'%H:%M %d/%m/%Y')).total_seconds()<12*3600: st[duan]='mới'; continue
+        except Exception: pass
+        if _tl.time()-TL0>float(os.environ.get('LAND_BUDGET','180')): st[duan]='để lần sau'; continue
         try: o=landing(pid)
         except Exception as e: st[duan]='lỗi '+str(e)[:80]; continue
         h=hashlib.sha256(json.dumps(o,sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16]
@@ -358,8 +364,17 @@ def main():
         print(f"{src['k']:12} {res['n']:4} {res['msg']}",file=sys.stderr)
         d=per.setdefault(src['duan'],{'src':[],'u':[]})
         d['src'].append(res); d['u']+=recs
-    for duan,(pid,sub) in SALEPRO.items():
+    import time as _t; T0=_t.time(); BUDGET=float(os.environ.get('SP_BUDGET','360'))
+    def _spat(duan):
+        od=olds.setdefault(duan,old_feed(duan)); a=((od or {}).get('sp') or {}).get('at') or ''
+        try: return datetime.datetime.strptime(a,'%H:%M %d/%m/%Y').timestamp()
+        except Exception: return 0
+    for duan,(pid,sub) in sorted(SALEPRO.items(),key=lambda kv:_spat(kv[0])):
         d=per.setdefault(duan,{'src':[],'u':[]})
+        if _t.time()-T0>BUDGET:
+            od=olds.setdefault(duan,old_feed(duan))
+            if od and od.get('sp'): d['sp']=od['sp']
+            continue
         try:
             r=salepro(pid,sub)
             if not any(x[13]=='' for x in r['u']): raise Exception('không có căn đang mở bán')
