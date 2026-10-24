@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
 // nút quay về trang chọn dự án (mọi trang trừ trang chủ)
 (function(){
   var p=location.pathname, home=/\/(index\.html)?$/.test(p); if(home) return;
-  var css="body.gh-pad{padding-top:calc(44px + env(safe-area-inset-top))!important}.gh-bar{position:fixed;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) 10px 8px;background:linear-gradient(var(--bg,#f5f3ee) 75%,rgba(255,255,255,0));z-index:60;display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:8px;align-items:center;pointer-events:none;padding-bottom:4px}.gh-bar::-webkit-scrollbar{display:none}.gh-bar>*{flex:none;white-space:nowrap}@media (max-width:480px){.gh-bar{gap:6px}.gh-bar .gh-home,.gh-bar .ptg-fab,.gh-bar .xp-fab{padding:7px 10px!important;font-size:12.5px!important}}.gh-bar>*{pointer-events:auto}.gh-bar .ptg-fab,.gh-bar .xp-fab{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;padding:7px 13px!important;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif!important;box-shadow:0 4px 14px rgba(0,0,0,.2)!important;margin:0!important}.gh-bar [hidden]{display:none!important}.gh-home{position:static;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home,.gh-bar{display:none}body.gh-pad{padding-top:0!important}}";
+  var css="body.gh-pad{padding-top:calc(44px + env(safe-area-inset-top))!important}.gh-bar{position:fixed;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) 10px 8px;background:linear-gradient(var(--bg,#f5f3ee) 75%,rgba(255,255,255,0));z-index:60;display:flex;flex-wrap:wrap;overflow:visible;gap:8px;align-items:center;pointer-events:none;padding-bottom:4px}.gh-bar::-webkit-scrollbar{display:none}.gh-bar>*{flex:none;white-space:nowrap}@media (max-width:480px){.gh-bar{gap:6px}.gh-bar .gh-home,.gh-bar .ptg-fab,.gh-bar .xp-fab{padding:7px 10px!important;font-size:12.5px!important}}.gh-bar>*{pointer-events:auto}.gh-bar .ptg-fab,.gh-bar .xp-fab{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;padding:7px 13px!important;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif!important;box-shadow:0 4px 14px rgba(0,0,0,.2)!important;margin:0!important}.gh-bar [hidden]{display:none!important}.gh-home{position:static;display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#0e4f4b;color:#fff;text-decoration:none;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2)}.gh-home:hover{background:#17736d}@media print{.gh-home,.gh-bar{display:none}body.gh-pad{padding-top:0!important}}";
   function put(){
     if(document.querySelector(".gh-bar")) return;
     var st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
@@ -203,4 +203,87 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
     new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){ if(n.nodeType===1&&n.classList.contains("a")) setTimeout(function(){decorate(n);},30); });});}).observe(log,{childList:true});
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else start();
+})();
+
+// Nút "Nhập quỹ căn mới": người dùng đã kích hoạt nhập quỹ căn (từng căn hoặc dán từ Excel) → lưu về máy chủ → ứng dụng tự cập nhật
+(function(){
+  var SV2="https://script.google.com/macros/s/AKfycbwEgmv4gliQyFWw9vm-h2f9AjxB0kQJGGAQuC4JfkXrY_YG3L0Y7gcAUebNk_Dr7oo/exec";
+  var K=(location.pathname.split("/").pop()||"").replace(/\.html$/,""); if(!K||K==="index"||/dongtien$/.test(K)) return;
+  var LOW={"sb": "L", "hlx": "L", "ho": "L", "dk": "L", "es": "L", "ri": "L", "ru": "L", "ga": "L", "np": "L", "sg": "L", "p1427": "L", "p1411": "L", "p1409": "L", "p1388": "L", "p872": "L", "p1382": "L", "p1351": "L", "p1371": "L", "p1412": "L", "p1446": "L", "p1464": "L", "p1368": "L", "p1375": "L", "p1359": "L", "p1414": "L", "p1450": "L", "p1445": "L", "p1419": "L", "p1451": "L", "p1282": "L", "p1350": "L", "p308": "L", "p788": "L", "p465": "L", "p1461": "L", "p1261": "L", "p1463": "L", "p1265": "L", "p87": "L", "p355": "L", "p1314": "L", "q1290": "L", "q1468": "L", "q1389": "L", "q1272": "L", "q1356": "L", "q613": "L", "q1258": "L", "q1037": "L", "q1277": "L", "q1385": "L", "q1269": "L", "q1326": "L", "q1362": "L", "q1355": "L", "q1297": "L", "q1296": "L", "q1420": "L", "q1332": "L", "q1441": "L", "q1396": "L", "q1360": "L", "q1401": "L", "q1366": "L", "q1434": "L", "q1323": "L", "q1253": "L", "q1442": "L", "q1405": "L", "q1403": "L", "q1399": "L", "q1456": "L", "q1318": "L", "q1467": "L", "q1367": "L"};
+  var FA=[["c","Mã căn *"],["toa","Tòa"],["tang","Tầng"],["truc","Trục"],["loai","Loại căn"],["tt","DT thông thủy (m²)"],["tim","DT tim tường (m²)"],["huong","Hướng"],["view","View"],["gia","Giá bán"],["tts","Giá thanh toán sớm"],["gc","Ghi chú giá (VAT, KPBT…)"],["quy","Nguồn quỹ / sàn"],["st","Tình trạng"],["note","Ghi chú"]];
+  var FL=[["c","Mã căn *"],["khu","Phân khu / dãy"],["loai","Loại căn"],["dat","DT đất (m²)"],["xd","DT xây dựng (m²)"],["tang","Số tầng"],["huong","Hướng"],["gia","Giá bán"],["tts","Giá thanh toán sớm"],["gc","Ghi chú giá (VAT, KPBT…)"],["quy","Nguồn quỹ / sàn"],["st","Tình trạng"],["note","Ghi chú"]];
+  var F=LOW[K]?FL:FA, extra=[];
+  var MAP=[[/^(ma can|ma|can|ma so|code)$/,"c"],[/toa|block|building/,"toa"],[/phan khu|^khu|day nha|^day/,"khu"],[/so tang|^tang|floor/,"tang"],[/truc|axis/,"truc"],[/loai|type|so pn|phong ngu/,"loai"],[/thong thuy|^tt$|dt tt|dien tich thong/,"tt"],[/tim tuong|tim$/,"tim"],[/dat/,"dat"],[/xay dung|^xd|san xay/,"xd"],[/huong/,"huong"],[/view|tam nhin/,"view"],[/thanh toan som|tt som|tts|gia sau uu dai/,"tts"],[/ghi chu gia|ghi chu ve gia|vat|kpbt/,"gc"],[/gia|tong gia|price/,"gia"],[/quy|san|nguon|dai ly/,"quy"],[/tinh trang|trang thai|status/,"st"],[/ghi chu|note/,"note"]];
+  function fold(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").replace(/[^a-z0-9]+/g," ").trim();}
+  function lic(){try{return JSON.parse(localStorage.getItem("pb_qa_lic")||"null")||{};}catch(e){return {};}}
+  function E(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function label(k){var f=(F.concat(extra)).filter(function(x){return x[0]===k;})[0]; return f?f[1].replace(" *",""):k.replace(/^x:/,"");}
+  function cache(u){try{localStorage.setItem("uq_"+K,JSON.stringify({at:Date.now(),u:u}));}catch(e){} try{window.dispatchEvent(new Event("uq"));}catch(e){}}
+  function cached(){try{return (JSON.parse(localStorage.getItem("uq_"+K)||"null")||{}).u||[];}catch(e){return [];}}
+  function jget(q){var cb="ghq"+Date.now()+Math.floor(Math.random()*1e4), u=SV2+"?callback="+cb; for(var k in q) u+="&"+k+"="+encodeURIComponent(q[k]);
+    return fetch(u,{credentials:"omit"}).then(function(r){return r.text();}).then(function(t){var i=t.indexOf("("),j=t.lastIndexOf(")"); return JSON.parse(t.slice(i+1,j));});}
+  function refresh(){ if(!window.fetch) return; jget({action:"quy",duan:K}).then(function(r){ if(r&&r.ok) cache(r.u||[]); }).catch(function(){}); }
+  var css=".gh-bar .gh-home{order:0}.gh-bar .ptg-fab{order:1}.gh-bar .xp-fab{order:2}.gh-bar .uq-btn{order:3}.uq-btn{border:none;border-radius:999px;padding:7px 13px;background:#1d7a4c;color:#fff;font:600 13.5px system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer;white-space:nowrap}.uq-btn:hover{background:#15603b}"
+   +".uq-ov{position:fixed;inset:0;z-index:200;background:rgba(10,20,30,.55);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:calc(16px + env(safe-area-inset-top)) 10px 30px}"
+   +".uq-pn{background:#fff;color:#16302e;width:100%;max-width:860px;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);font:14px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif}"
+   +".uq-hd{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #e3e8ee}.uq-hd b{font-size:16px}.uq-hd button{margin-left:auto;border:none;background:#eef2f5;border-radius:8px;width:34px;height:34px;font-size:20px;cursor:pointer}"
+   +".uq-bd{padding:14px 18px;display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}.uq-bd>*{min-width:0}.uq-pn{min-width:0;box-sizing:border-box}.uq-tabs{display:flex;gap:6px}.uq-tabs button{border:1px solid #d5dde5;background:#fff;border-radius:999px;padding:6px 14px;font:600 13px inherit;cursor:pointer}.uq-tabs button[aria-pressed=true]{background:#1d7a4c;border-color:#1d7a4c;color:#fff}"
+   +".uq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}.uq-grid label{display:grid;gap:3px;font-size:12.5px;color:#4b5d66}.uq-grid input,.uq-grid select,.uq-bd textarea{border:1px solid #cfd8e0;border-radius:8px;padding:8px 10px;font:14px inherit;color:#16302e;background:#fff;width:100%}"
+   +".uq-bd textarea{min-height:140px;font-family:ui-monospace,Consolas,monospace;font-size:12.5px}.uq-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.uq-row button{border:1px solid #cfd8e0;background:#fff;border-radius:9px;padding:8px 14px;font:600 13.5px inherit;cursor:pointer}.uq-row .pri{background:#1d7a4c;border-color:#1d7a4c;color:#fff}"
+   +".uq-note{font-size:12.5px;color:#5b6b73}.uq-msg{font-size:13.5px;min-height:18px}.uq-msg.err{color:#b3261e}.uq-msg.ok{color:#1d7a4c}.uq-tw{overflow-x:auto;border:1px solid #e3e8ee;border-radius:10px}.uq-tw table{border-collapse:collapse;font-size:12.5px;min-width:100%}.uq-tw th,.uq-tw td{border-bottom:1px solid #eef1f4;padding:5px 8px;text-align:left;white-space:nowrap}.uq-tw th{background:#f4f7f9}";
+  function open(){
+    var L=lic(); var ov=document.createElement("div"); ov.className="uq-ov";
+    ov.innerHTML='<div class="uq-pn" role="dialog" aria-label="Nhập quỹ căn mới"><div class="uq-hd"><b>Nhập quỹ căn mới</b><button type="button" aria-label="Đóng">×</button></div><div class="uq-bd">'
+     +(L.phone?'':'<p class="uq-msg err">Cần kích hoạt ứng dụng bằng số điện thoại trước khi nhập quỹ căn.</p>')
+     +'<p class="uq-note">Quỹ căn nhập ở đây được lưu vào hệ thống và hiện ngay trong ứng dụng của dự án này cho mọi người dùng (ghi rõ là do người dùng nhập). Cùng mã căn nhập lại thì lấy thông tin mới nhất.</p>'
+     +'<div class="uq-tabs"><button type="button" data-t="one" aria-pressed="true">Nhập từng căn</button><button type="button" data-t="paste" aria-pressed="false">Dán từ Excel / Google Sheet</button></div>'
+     +'<div data-p="one"><div class="uq-grid" id="uq-f"></div><div class="uq-row" style="margin-top:10px"><button type="button" id="uq-addcol">+ Thêm cột</button><button type="button" id="uq-addrow">Thêm căn vào danh sách</button></div></div>'
+     +'<div data-p="paste" hidden><p class="uq-note">Copy cả bảng trong Excel hoặc Google Sheet (gồm dòng tiêu đề) rồi dán vào ô dưới. Cột được nhận theo tên tiêu đề (Mã căn, Tòa, Tầng, Loại, Diện tích, Hướng, Giá…); cột lạ được giữ nguyên làm cột mới.</p><textarea id="uq-paste" placeholder="Mã căn&#9;Tòa&#9;Tầng&#9;Loại&#9;Diện tích&#9;Giá&#10;C22130&#9;C2&#9;21&#9;Studio&#9;30,2&#9;3,65 tỷ"></textarea><div class="uq-row" style="margin-top:8px"><button type="button" id="uq-parse">Đọc bảng</button></div></div>'
+     +'<div><b style="font-size:13.5px">Danh sách sẽ lưu (<span id="uq-n">0</span> căn)</b><div class="uq-tw" style="margin-top:6px"><table id="uq-tb"></table></div></div>'
+     +'<div class="uq-row"><button type="button" class="pri" id="uq-save">Lưu vào hệ thống</button><button type="button" id="uq-clear">Xóa danh sách</button><span class="uq-msg" id="uq-msg"></span></div>'
+     +'</div></div>';
+    document.body.appendChild(ov);
+    var list=[], $=function(s){return ov.querySelector(s);};
+    function close(){ov.remove();}
+    $(".uq-hd button").onclick=close; ov.addEventListener("click",function(e){if(e.target===ov) close();});
+    ov.querySelectorAll(".uq-tabs button").forEach(function(b){b.onclick=function(){ov.querySelectorAll(".uq-tabs button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");}); ov.querySelectorAll("[data-p]").forEach(function(p){p.hidden=p.getAttribute("data-p")!==b.getAttribute("data-t");});};});
+    function form(){ $("#uq-f").innerHTML=F.concat(extra).map(function(f){ var id="uq_"+f[0].replace(/[^a-z0-9]/gi,"_");
+      if(f[0]==="st") return '<label for="'+id+'">'+E(f[1])+'<select id="'+id+'" data-k="st"><option>Đang mở bán</option><option>Đã bán</option><option>Đang lock / giữ chỗ</option><option>Chưa mở bán</option></select></label>';
+      return '<label for="'+id+'">'+E(f[1])+'<input id="'+id+'" data-k="'+E(f[0])+'" autocomplete="off"></label>'; }).join(""); }
+    function cols(){var s={}; list.forEach(function(u){Object.keys(u).forEach(function(k){s[k]=1;});}); var o=F.map(function(f){return f[0];}).filter(function(k){return s[k];}); Object.keys(s).forEach(function(k){if(o.indexOf(k)<0) o.push(k);}); return o;}
+    function draw(){var c=cols(); $("#uq-n").textContent=list.length; $("#uq-tb").innerHTML=list.length?'<thead><tr>'+c.map(function(k){return '<th>'+E(label(k))+'</th>';}).join("")+'<th></th></tr></thead><tbody>'+list.map(function(u,i){return '<tr>'+c.map(function(k){return '<td>'+E(u[k]||"")+'</td>';}).join("")+'<td><button type="button" data-del="'+i+'" style="border:none;background:none;color:#b3261e;cursor:pointer">Bỏ</button></td></tr>';}).join("")+'</tbody>':'<tbody><tr><td class="uq-note" style="padding:10px">Chưa có căn nào. Nhập từng căn hoặc dán bảng từ Excel.</td></tr></tbody>';}
+    $("#uq-tb").addEventListener("click",function(e){var b=e.target.closest("[data-del]"); if(b){list.splice(+b.getAttribute("data-del"),1); draw();}});
+    function msg(t,c){var m=$("#uq-msg"); m.textContent=t; m.className="uq-msg "+(c||"");}
+    $("#uq-addcol").onclick=function(){var w=document.createElement("div"); w.className="uq-row"; w.innerHTML='<input id="uq-newcol" placeholder="Tên cột mới, ví dụ: Chính sách, Số phòng ngủ" style="flex:1;min-width:200px;border:1px solid #cfd8e0;border-radius:8px;padding:8px 10px;font:14px inherit"><button type="button" class="pri">Thêm</button>';
+      this.parentNode.after(w); var inp=w.querySelector("input"); inp.focus(); w.querySelector("button").onclick=function(){var n=inp.value.trim(); if(n){var k="x:"+n.slice(0,30); if(!extra.some(function(x){return x[0]===k;})) extra.push([k,n.slice(0,30)]); var keep={}; ov.querySelectorAll("#uq-f [data-k]").forEach(function(i){keep[i.getAttribute("data-k")]=i.value;}); form(); ov.querySelectorAll("#uq-f [data-k]").forEach(function(i){if(keep[i.getAttribute("data-k")]!=null) i.value=keep[i.getAttribute("data-k")];});} w.remove();};};
+    $("#uq-addrow").onclick=function(){var u={}; ov.querySelectorAll("#uq-f [data-k]").forEach(function(i){var v=i.value.trim(); if(v) u[i.getAttribute("data-k")]=v;});
+      u.c=String(u.c||"").toUpperCase().replace(/\s+/g,""); if(!u.c){msg("Cần nhập mã căn.","err"); return;}
+      list=list.filter(function(x){return x.c!==u.c;}); list.push(u); draw(); msg("Đã thêm căn "+u.c+" vào danh sách. Bấm \"Lưu vào hệ thống\" để lưu.","ok");
+      ov.querySelectorAll("#uq-f input").forEach(function(i){ if(["c","tang","truc"].indexOf(i.getAttribute("data-k"))>=0) i.value=""; }); var c0=$("#uq-f [data-k=c]"); if(c0) c0.focus();};
+    $("#uq-parse").onclick=function(){var txt=$("#uq-paste").value.replace(/\r/g,"").trim(); if(!txt){msg("Chưa có dữ liệu để đọc.","err"); return;}
+      var lines=txt.split("\n").filter(function(l){return l.trim();}); var sep=lines[0].indexOf("\t")>=0?"\t":(lines[0].indexOf(";")>=0?";":",");
+      var H=lines[0].split(sep).map(function(h){return h.trim();}); var keys=H.map(function(h){var f=fold(h); for(var i=0;i<MAP.length;i++) if(MAP[i][0].test(f)) return MAP[i][1]; var k="x:"+h.slice(0,30); if(!extra.some(function(x){return x[0]===k;})) extra.push([k,h.slice(0,30)]); return k;});
+      if(keys.indexOf("c")<0){msg("Không thấy cột mã căn. Dòng đầu cần có tiêu đề, ví dụ \"Mã căn\".","err"); return;}
+      var n=0; lines.slice(1).forEach(function(l){var v=l.split(sep), u={}; keys.forEach(function(k,i){var x=(v[i]||"").trim(); if(x&&!u[k]) u[k]=x;}); u.c=String(u.c||"").toUpperCase().replace(/\s+/g,""); if(!u.c) return; list=list.filter(function(x){return x.c!==u.c;}); list.push(u); n++;});
+      draw(); form(); msg("Đã đọc "+n+" căn. Kiểm tra bảng rồi bấm \"Lưu vào hệ thống\".","ok");};
+    $("#uq-clear").onclick=function(){list=[]; draw(); msg("");};
+    $("#uq-save").onclick=function(){var L=lic(); if(!L.phone){msg("Cần kích hoạt ứng dụng bằng số điện thoại trước.","err"); return;} if(!list.length){msg("Danh sách đang trống.","err"); return;}
+      var btn=this; btn.disabled=true; var todo=list.slice(), done=0;
+      function next(){ if(!todo.length){ msg("Đã lưu "+done+" căn. Ứng dụng đã cập nhật quỹ căn mới.","ok"); btn.disabled=false; var m={}; cached().forEach(function(u){m[u.c]=u;}); list.forEach(function(u){var x={}; for(var k in u) x[k]=u[k]; x.t=new Date().toLocaleString("vi-VN"); m[u.c]=x;}); cache(Object.keys(m).map(function(k){return m[k];})); list=[]; draw(); setTimeout(refresh,3000); return; }
+        var part=[], len=0; while(todo.length&&part.length<15){var s=JSON.stringify(todo[0]); if(part.length&&len+s.length>1300) break; part.push(todo.shift()); len+=s.length;}
+        msg("Đang lưu… "+done+"/"+list.length);
+        jget({action:"nhapquy",phone:L.phone,duan:K,d:JSON.stringify(part)}).then(function(r){ if(!r||!r.ok){ msg((r&&r.msg)||"Chưa lưu được, thử lại sau.","err"); btn.disabled=false; return; } done+=part.length; next(); })
+         .catch(function(){ msg("Không kết nối được máy chủ. Kiểm tra mạng rồi bấm lưu lại.","err"); btn.disabled=false; });}
+      next();};
+    form(); draw();
+  }
+  function put(){
+    if(!document.getElementById("log")) return;
+    var st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
+    var b=document.createElement("button"); b.type="button"; b.className="uq-btn"; b.textContent="＋ Nhập quỹ căn mới"; b.onclick=open;
+    function place(){var bar=document.querySelector(".gh-bar"); if(bar&&b.parentNode!==bar){bar.appendChild(b); return true;} return false;}
+    if(!place()){ document.body.appendChild(b); b.style.cssText="position:fixed;right:12px;top:calc(56px + env(safe-area-inset-top));z-index:61"; var n=0, iv=setInterval(function(){ if(place()||++n>20){ clearInterval(iv); b.style.cssText=""; } },300); }
+    refresh(); setInterval(refresh,10*60*1000);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",put); else put();
 })();
