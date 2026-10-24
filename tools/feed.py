@@ -227,6 +227,91 @@ def enc(obj,key):
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     iv=os.urandom(12); ct=AESGCM(base64.b64decode(key)).encrypt(iv,json.dumps(obj,ensure_ascii=False,separators=(',',':')).encode(),None)
     return base64.b64encode(iv+ct).decode()
+
+# ===== SalePro công khai: nội dung các tab dự án (tổng quan, vị trí, 360, phân khu, mặt bằng, tiện ích...) – không lấy tin tức =====
+from html.parser import HTMLParser
+_OKT={'p','br','b','strong','i','em','u','ul','ol','li','h2','h3','h4','h5','img','a','table','thead','tbody','tr','td','th','span','div','blockquote','figure','figcaption'}
+_PH=re.compile(r'(?<!\d)(?:\+?84|0)(?:[\s.\-]?\d){8,10}(?!\d)')
+class _San(HTMLParser):
+    def __init__(s): super().__init__(convert_charrefs=True); s.o=[]; s.skip=0
+    def handle_starttag(s,t,a):
+        if t in('script','style','iframe','object','embed','form','svg'): s.skip+=1; return
+        if s.skip or t not in _OKT: return
+        a=dict(a); keep=''
+        if t=='img' and str(a.get('src','')).startswith('https://'): keep=f' src="{a["src"]}" loading="lazy" style="max-width:100%"'
+        elif t=='img': return
+        if t=='a' and str(a.get('href','')).startswith('https://'): keep=f' href="{a["href"]}" target="_blank" rel="noopener"'
+        if t in('td','th') and a.get('colspan','').isdigit(): keep=f' colspan="{a["colspan"]}"'
+        s.o.append(f'<{t}{keep}>')
+    def handle_endtag(s,t):
+        if t in('script','style','iframe','object','embed','form','svg'): s.skip=max(0,s.skip-1); return
+        if not s.skip and t in _OKT and t not in('img','br'): s.o.append(f'</{t}>')
+    def handle_data(s,d):
+        if not s.skip: s.o.append(_PH.sub('',d).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;'))
+def san(h):
+    if not h or not isinstance(h,str): return ''
+    x=_San(); x.feed(h); x.close(); r=''.join(x.o)
+    r=re.sub(r'<(p|li|span|div|h\d)>\s*(&nbsp;|\s)*</\1>','',r)
+    return r.strip()
+SPM='https://salepro.com/api/rest_api/pu/property/master/data/'
+def _spj(path,tries=3):
+    err=None
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(path if path.startswith('http') else SPM+path,headers=SPUA),timeout=60) as r: return json.loads(r.read().decode('utf8'))
+        except Exception as e:
+            err=e; import time; time.sleep(3*(i+1))
+    raise err
+def _img(o): return (o or {}).get('image_url') if isinstance(o,dict) else None
+def _yt(u):
+    m=re.search(r'(?:youtu\.be/|v=|embed/|shorts/)([\w-]{11})',u or ''); return m.group(1) if m else None
+def landing(pid):
+    D=_spj(f'get_project_detail/?project_id={pid}').get('data') or {}
+    I=D.get('project_info') or {}
+    if not I: raise Exception('không có project_info')
+    slug=I.get('project_slug')
+    try: L=(_spj(f'get_project_landing/?project_id={slug}').get('data') or [{}])[0] or {}
+    except Exception: L={}
+    low=I.get('project_type')!='high_rise'
+    try: TN=_spj(f'get_toanha_data/?project_id={pid}').get('data') or []
+    except Exception: TN=[]
+    try: PK=_spj(f'get_phankhu_data/?project_id={pid}').get('data') or []
+    except Exception: PK=[]
+    f=lambda k:norm(I.get(k)) or None
+    loc=re.search(r'src="(https://www\.google\.com/maps/embed[^"]+)"',I.get('iframe_location') or '')
+    o={'name':f('project_name'),'type':'Thấp tầng' if low else 'Cao tầng',
+       'facts':[[a,v] for a,v in [('Pháp lý / hình thức sở hữu',f('ownership_type')),('Tổng diện tích',f('total_area')),('Mật độ xây dựng',f('construction_density')),('Quy mô',f('development_scale')),('Chủ đầu tư',f('investor')),('Khởi công',f('build_date')),('Tiến độ',f('progress'))] if v]
+             +[[norm(x.get('name')),norm(x.get('value'))] for x in (L.get('project_info') or []) if x.get('name') and x.get('value')],
+       'desc':san(L.get('project_html_description') or I.get('short_description') or ''),'ovh':san(I.get('project_overview') or I.get('project_detail') or ''),
+       'img':_img(L.get('project_image')),'ban':[x.get('image_url') for x in (L.get('banner_desktop') or []) if x.get('image_url')][:4],
+       'loc':san(I.get('location') or ''),'map':loc.group(1) if loc else None,
+       'v360':I.get('image_360') if str(I.get('image_360') or '').startswith('https://') else None,
+       'i360':[[m.get('image_name') or x.get('image_coordinate_name') or '',m['image_url']] for x in (D.get('img_360_data') or []) for m in (x.get('image_data') or []) if m.get('image_url')][:30],
+       'fp':[[norm(x.get('floorplan_name')),x['image_url']] for x in (L.get('floor_plan') or []) if x.get('image_url')],
+       'pos':[[norm(x.get('image_coordinate_name')),m['image_url']] for x in (D.get('image_data') or []) for m in (x.get('image_data') or []) if m.get('image_url')][:40],
+       'prod':[[norm(x.get('product_name')),norm(x.get('product_price')),san(x.get('product_features') or '') if isinstance(x.get('product_features'),str) else '',x.get('image_url')] for x in (L.get('product') or [])],
+       'am':[[norm(x.get('amenity_name')),x.get('image_url')] for x in (L.get('amenities') or [])],
+       'vid':[[norm(L.get(p+'_title')),norm(L.get(p+'_content')),_yt(L.get(p+'_video_url'))] for p in ('discovery','entertainment') if L.get(p+'_title') or _yt(L.get(p+'_video_url'))],
+       'csi':[u for u in (I.get('sale_policy_images') or []) if isinstance(u,str) and u.startswith('https://')],
+       'lk':[[norm(x.get('link_utility_name')),x['link_utility_url']] for x in (D.get('link_general') or [])+(D.get('link_utility') or []) if str(x.get('link_utility_url','')).startswith('https://')],
+       'tn':[[norm(x.get('building_name')),norm(x.get('subdivision_name')),norm(x.get('building_total_floor')),x.get('total_apartment'),norm(x.get('handover_standard')),_img(x.get('avatar'))] for x in TN if x.get('state','public')=='public'],
+       'pk':[[norm(x.get('subdivision_name')),norm(x.get('total_area')),norm(x.get('total_apartment')),norm(x.get('style_build')),_img(x.get('avatar'))] for x in PK if x.get('state','public')=='public']}
+    o['desc']=_PH.sub('',o['desc']); seen=set(); o['facts']=[x for x in o['facts'] if not (x[0].lower() in seen or seen.add(x[0].lower()))]
+    return o
+def run_landing(out_dir,key,now,plain=False):
+    st={}
+    for duan,(pid,sub) in SALEPRO.items():
+        p=os.path.join(out_dir,'land_'+duan+'.json')
+        try: o=landing(pid)
+        except Exception as e: st[duan]='lỗi '+str(e)[:80]; continue
+        h=hashlib.sha256(json.dumps(o,sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:16]
+        try: old=json.load(open(p))
+        except Exception: old={}
+        if old.get('h')==h and not plain: st[duan]='không đổi'; continue
+        body={'at':now.strftime('%H:%M %d/%m/%Y'),'o':o}
+        json.dump({'h':h,'at':body['at'],'d':body} if plain or not key else {'h':h,'at':body['at'],'e':enc(body,key)},open(p,'w',encoding='utf8'),ensure_ascii=False,separators=(',',':'))
+        st[duan]='cập nhật'
+    print('LANDING',json.dumps(st,ensure_ascii=False),file=sys.stderr)
 def main():
     plain='--plain' in sys.argv
     key=os.environ.get('APP_KEY','')
@@ -301,5 +386,7 @@ def main():
         json.dump(data,open(p,'w',encoding='utf8'),ensure_ascii=False,separators=(',',':'))
         status[duan]='cập nhật'
     print(json.dumps(status,ensure_ascii=False),file=sys.stderr)
+    try: run_landing(out_dir,key,now,plain)
+    except Exception as e: print('LANDING lỗi',e,file=sys.stderr)
     for l in LOG[:40]: print('LOG',l,file=sys.stderr)
 if __name__=='__main__': main()
