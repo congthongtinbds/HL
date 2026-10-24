@@ -1,3 +1,4 @@
+function uqTen(){return String(document.title||"").replace(/\s*[-–|]?\s*Hỏi\s*Đáp\s*$/i,"").replace(/^\s*Dòng tiền\s*/i,"").trim().slice(0,120);}
 /* ===== Giao diện luôn nền sáng (không theo chế độ tối của máy); trang hỏi đáp trên máy tính: cuộn theo trang, khung trả lời rộng ===== */
 (function(){
   var r=document.documentElement; r.setAttribute("data-theme","light"); r.style.colorScheme="light";
@@ -411,7 +412,7 @@ var UQP=(function(){
       function next(){ if(!todo.length){ msg("Đã lưu "+done+" căn. Ứng dụng đã cập nhật quỹ căn mới.","ok"); btn.disabled=false; var m={}; cached().forEach(function(u){m[u.c]=u;}); list.forEach(function(u){var x={}; for(var k in u) x[k]=u[k]; x.t=new Date().toLocaleString("vi-VN"); m[u.c]=x;}); cache(Object.keys(m).map(function(k){return m[k];})); list=[]; draw(); setTimeout(refresh,3000); return; }
         var part=[], len=0, lim=usePost?150:15, cap=usePost?200000:1300; while(todo.length&&part.length<lim){var s=JSON.stringify(todo[0]); if(part.length&&len+s.length>cap) break; part.push(todo.shift()); len+=s.length;}
         msg("Đang lưu… "+done+"/"+list.length);
-        (usePost?fetch(SV2,{method:"POST",credentials:"omit",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"nhapquy",phone:L.phone,duan:K,d:part})}).then(function(r){return r.json();}).catch(function(){usePost=false; return jget({action:"nhapquy",phone:L.phone,duan:K,d:JSON.stringify(part)});}):jget({action:"nhapquy",phone:L.phone,duan:K,d:JSON.stringify(part)})).then(function(r){ if(!r||!r.ok){ msg((r&&r.msg)||"Chưa lưu được, thử lại sau.","err"); btn.disabled=false; return; } done+=part.length; next(); })
+        (usePost?fetch(SV2,{method:"POST",credentials:"omit",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"nhapquy",phone:L.phone,duan:K,ten:uqTen(),d:part})}).then(function(r){return r.json();}).catch(function(){usePost=false; return jget({action:"nhapquy",phone:L.phone,duan:K,ten:uqTen(),d:JSON.stringify(part)});}):jget({action:"nhapquy",phone:L.phone,duan:K,ten:uqTen(),d:JSON.stringify(part)})).then(function(r){ if(!r||!r.ok){ msg((r&&r.msg)||"Chưa lưu được, thử lại sau.","err"); btn.disabled=false; return; } done+=part.length; next(); })
          .catch(function(){ msg("Không kết nối được máy chủ. Kiểm tra mạng rồi bấm lưu lại.","err"); btn.disabled=false; });}
       next();};
     form(); draw();
