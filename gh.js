@@ -126,8 +126,9 @@ document.addEventListener("DOMContentLoaded",function(){fixAll(); setTimeout(fix
   function lic(){try{return JSON.parse(localStorage.getItem("pb_qa_lic")||"null")||{};}catch(e){return {};}}
   function load(){try{return JSON.parse(localStorage.getItem(QK)||"[]")||[];}catch(e){return [];}}
   function save(a){try{localStorage.setItem(QK,JSON.stringify(a.slice(-200)));}catch(e){}}
-  var app=(document.title||"").replace(/\s*Hỏi Đáp\s*$/,"").trim()||location.pathname.split("/").pop();
-  function add(q){q=String(q||"").replace(/\s+/g," ").trim(); if(!q) return; var a=load(); a.push([Date.now(),app,q.slice(0,300)]); save(a); if(a.length>=5) flush();}
+  var TEN={"sc": "Sun Centro Town", "scdongtien": "Sun Centro Town – Dòng tiền", "sb": "Sora Bay Halong", "sbdongtien": "Sora Bay Halong – Dòng tiền", "lm": "Landmark 35", "lmdongtien": "Landmark 35 – Dòng tiền", "sf": "Sun Festo Town", "sfdongtien": "Sun Festo Town – Dòng tiền", "ih": "Imperia Holiday", "ihdongtien": "Imperia Holiday – Dòng tiền", "pb": "Prima Bay", "dongtien": "Prima Bay – Dòng tiền homestay", "ab": "Aria Bay", "abdongtien": "Aria Bay – Dòng tiền", "hlx": "Vin Hạ Long Xanh", "hlxdongtien": "Vin Hạ Long Xanh – Dòng tiền", "ho": "Horizon Bay", "hodongtien": "Horizon Bay – Dòng tiền", "sk": "SkyM", "skdongtien": "SkyM – Dòng tiền", "se": "The Sea", "nx": "Marina Living (NOXH)", "dk": "Vinhomes Golden City", "xi": "Xanh Island", "es": "Emerald Symphony", "ri": "Vinhomes Royal Island", "fc": "Flamingo Cát Bà", "am": "Ambience – Gamuda", "ru": "Ramond Urbaniz", "ga": "Vinhomes Golden Avenue", "cv": "Crystal Holidays Harbour", "np": "Noble Palace Hạ Long", "js": "Jade Square", "index": "Trang chọn dự án", "pbdongtien": "Prima Bay – Dòng tiền homestay"};
+  function appName(){var f=(location.pathname.split("/").pop()||"index").replace(/\.html$/,"")||"index"; return TEN[f]||(document.title||"").replace(/\s*Hỏi Đáp\s*$/,"").trim()||f;}
+  function add(q){q=String(q||"").replace(/\s+/g," ").trim(); if(!q) return; var a=load(); a.push([Date.now(),appName(),q.slice(0,300)]); save(a); if(a.length>=5) flush();}
   var busy=false;
   function flush(){
     var L=lic(); if(busy||!L.phone) return; var a=load(); if(!a.length) return;
