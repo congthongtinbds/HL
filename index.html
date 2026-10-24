@@ -68,7 +68,7 @@ details li{margin:4px 0}
 <header class="top">
   <div class="top-in">
     <h1>Tra cứu thông tin dự án bất động sản</h1>
-    <p>Hỏi đáp và bảng tính dòng tiền (xuất được file PDF) của 104 dự án căn hộ, nhà phố, biệt thự, nhà ở xã hội tại Quảng Ninh, Hải Phòng, Hà Nội, Hưng Yên – chọn dự án để mở.</p>
+    <p>Hỏi đáp và bảng tính dòng tiền (xuất được file PDF) của 174 dự án căn hộ, nhà phố, biệt thự, nhà ở xã hội trên toàn quốc (Quảng Ninh, Hải Phòng, Hà Nội, Hưng Yên, TP.HCM, Đà Nẵng, Khánh Hòa…) – chọn dự án để mở.</p>
     <div class="who"><div><b>Lương Văn Chung</b><span>Hỗ trợ kỹ thuật</span></div><a class="call" href="tel:0813631111">Gọi 081.363.1111</a></div>
   </div>
   <svg class="karst" viewBox="0 0 640 96" preserveAspectRatio="none" aria-hidden="true">
@@ -202,11 +202,81 @@ const PROJ=[
  ["The Cityon", "Căn hộ · Vinhomes Ocean Park 3, Văn Lâm, Hưng Yên", "#2d6b45", "p2", "p1453", "", ""],
  ["The Fullton", "Nhà phố, biệt thự · Nghĩa Trụ, Văn Giang, Hưng Yên", "#6a4a8c", "p2", "p1265", "", ""],
  ["Vinhomes Ocean Park 2", "Nhà phố, biệt thự · Văn Giang, Hưng Yên", "#c0504d", "p2", "p87", "", ""],
- ["Vinhomes Ocean Park 3", "Nhà phố, biệt thự · Văn Lâm, Hưng Yên", "#3a6ea5", "p2", "p355", "", ""]];
+ ["Vinhomes Ocean Park 3", "Nhà phố, biệt thự · Văn Lâm, Hưng Yên", "#3a6ea5", "p2", "p355", "", ""],
+ ["Malibu Walk", "Nhà phố, biệt thự (đã hết hàng) · Vinhomes Ocean Park 1", "#3f7a2e", "p2", "p1314", "", ""],
+ ["Blanca City", "Căn hộ · 3 Tháng 2, Phường Phước Thắng, Thành phố Hồ Chí Minh", "#1f6f8b", "p2", "q1289", "", ""],
+ ["Blanca City (thấp tầng)", "Nhà phố, biệt thự · 3 Tháng 2, Phường Phước Thắng, Thành phố Hồ Chí Minh", "#b0582a", "p2", "q1290", "", ""],
+ ["Gladia By The Waters", "Nhà phố, biệt thự · Võ Chí Công, Phường Bình Trưng, TP.Hồ Chí Minh", "#246b9e", "p2", "q1468", "", ""],
+ ["Gladia Heights", "Căn hộ · Võ Chí Công, Quận 2, TP.Hồ Chí Minh (Nay là Phường Bình…", "#7a3b2e", "p2", "q1413", "", ""],
+ ["Grand Marina Saigon", "Căn hộ · Số 2 Tôn Đức Thắng, phường Sài Gòn, TP.HCM", "#1f7a6b", "p2", "q1260", "", ""],
+ ["Lumière Boulevard", "Căn hộ · Số 8 đường D1 Đại đô thị Vinhomes Grand Park, P. Long…", "#2d6b45", "p2", "q771", "", ""],
+ ["Masteri Centre Point", "Căn hộ · Vinhomes Grand Park, Số 6 đường D1, Đại đô thị Grand…", "#6a4a8c", "p2", "q772", "", ""],
+ ["Meyhomes Capital Phú Quốc", "Căn hộ (đã hết hàng) · P. An Thới, TP. Phú Quốc, tỉnh An Giang", "#c0504d", "p2", "q1327", "", ""],
+ ["Palm City", "Căn hộ · Đường Song Hành Cao Tốc, Phường Bình Trưng, Thành phố Hồ…", "#3a6ea5", "p2", "q1423", "", ""],
+ ["Salacia Villas", "Nhà phố, biệt thự · phường Tân Thành, TP Hồ Chí Minh", "#8a6d1e", "p2", "q1389", "", ""],
+ ["Selavia Phú Quốc", "Căn hộ · KĐT Selavia Phú Quốc, Nguyễn Văn Cừ, Tổ 11, Suối Lớn,…", "#9a3d5c", "p2", "q1460", "", ""],
+ ["Sycamore Bình Dương (thấp tầng)", "Nhà phố, biệt thự · Phường Bình Dương, Thành phố Hồ Chí Minh", "#2f7f9e", "p2", "q1272", "", ""],
+ ["Sycamore Bình Dương – Orchard Collection", "Căn hộ · Phường Bình Dương, Thành phố Hồ Chí Minh", "#1d3b63", "p2", "q1370", "", ""],
+ ["TMDV Vinhomes Grand Park (thấp tầng)", "Nhà phố, biệt thự · Đường Nguyễn Xiển - Phước Thiện, phường Long Bình, TP. Hồ…", "#8a4b2a", "p2", "q1356", "", ""],
+ ["The Berkley Thảo Điền", "Căn hộ · 177 Xa Lộ Hà Nội, P.Thảo Điền, Quận 2, TP.Thủ Đức, TP.HCM", "#7a5c1e", "p2", "q1353", "", ""],
+ ["The Global City", "Căn hộ · Đường Đỗ Xuân Hợp, phường Bình Trưng, TP. Hồ Chí Minh", "#a3162b", "p2", "q1333", "", ""],
+ ["The Global City (thấp tầng)", "Nhà phố, biệt thự · Đường Đỗ Xuân Hợp, phường Bình Trưng, TP. Hồ Chí Minh", "#6b4e8a", "p2", "q613", "", ""],
+ ["Vinhomes Grand Park", "Căn hộ · Đường Nguyễn Xiển - Phước Thiện, phường Long Bình, TP. Hồ…", "#0f6f68", "p2", "q612", "", ""],
+ ["Vinhomes Grand Park (shophouse)", "Nhà phố, biệt thự · Đường Nguyễn Xiển - Phước Thiện, phường Long Bình, TP. Hồ…", "#2f6a9a", "p2", "q1258", "", ""],
+ ["Vinhomes Green City", "Nhà phố, biệt thự · Đường Quốc Lộ N2, Hậu Nghĩa, Long An (cũ)", "#3f7a2e", "p2", "q1037", "", ""],
+ ["Vinhomes Green Paradise", "Nhà phố, biệt thự · Xã Long Hoà, Thị trấn Cần Thạnh, Huyện Cần Giờ, TP. Hồ…", "#1f6f8b", "p2", "q1277", "", ""],
+ ["Vinhomes Sài Gòn Park", "Nhà phố, biệt thự · Xã Tân Thới Nhì và Xã Xuân Thới Sơn, Huyện Hóc Môn, TP.…", "#b0582a", "p2", "q1385", "", ""],
+ ["Capital Square", "Căn hộ · Đường Trần Hưng Đạo & Ngô Quyền, Phường An Hải Bắc, Quận…", "#246b9e", "p2", "q1308", "", ""],
+ ["Fours Tower", "Căn hộ · Phường Hòa Quý, quận Ngũ Hành Sơn, thành phố Đà Nẵng", "#7a3b2e", "p2", "q1363", "", ""],
+ ["M Riverside Danang", "Căn hộ (đã hết hàng) · Số 6 đường 2/9, phường Hải Châu, TP. Đà Nẵng", "#1f7a6b", "p2", "q1466", "", ""],
+ ["Masteri Rivera Danang", "Căn hộ (đã hết hàng) · Nguyễn Lộ Trạch, Q. Hải Châu, Đà Nẵng", "#2d6b45", "p2", "q790", "", ""],
+ ["Newtown Diamond", "Căn hộ · Đường Trường Sa, P. Hòa Hải, Q. Ngũ Hành Sơn, TP. Đà Nẵng", "#6a4a8c", "p2", "q1306", "", ""],
+ ["S-Light Tower", "Căn hộ · Giao lộ đường Nguyễn Đình Thi và 29/3, trục đường lớn KĐT…", "#c0504d", "p2", "q1406", "", ""],
+ ["Sun Cora Tower", "Căn hộ · Giao điểm Đường 29/3 & Đường Nguyễn Phước Lan, Hoà Xuân,…", "#3a6ea5", "p2", "q1285", "", ""],
+ ["Sun Riverpolis", "Nhà phố, biệt thự (đã hết hàng) · Phường Hòa Quý, quận Ngũ Hành Sơn, thành phố Đà Nẵng", "#8a6d1e", "p2", "q1269", "", ""],
+ ["Sun Solar Residence", "Căn hộ (đã hết hàng) · Số 9 đường Lê Duẩn, P.Hải Châu, Q.Hải Châu, TP.Đà Nẵng", "#9a3d5c", "p2", "q1328", "", ""],
+ ["Sun Spana Tower", "Căn hộ · Nguyễn Phước Lan, Hoà Xuân, Cẩm Lệ, Đà Nẵng", "#2f7f9e", "p2", "q1275", "", ""],
+ ["Sun Symphony 5", "Căn hộ · Trần Hưng Đạo & Lê Văn Duyệt, P.Nại Hiên Đông, Q.Sơn Trà,…", "#1d3b63", "p2", "q1391", "", ""],
+ ["Sun Symphony Residence", "Căn hộ · Trần Hưng Đạo & Lê Văn Duyệt, P.Nại Hiên Đông, Q.Sơn Trà,…", "#8a4b2a", "p2", "q1337", "", ""],
+ ["Sun Symphony Residence (thấp tầng)", "Nhà phố, biệt thự (đã hết hàng) · Trần Hưng Đạo & Lê Văn Duyệt, P.Nại Hiên Đông, Q.Sơn Trà,…", "#7a5c1e", "p2", "q1326", "", ""],
+ ["Sun Võ Chí Công", "Nhà phố, biệt thự (đã hết hàng) · Đường Võ Chí Công nối dài, Hòa Xuân, Đà Nẵng", "#a3162b", "p2", "q1362", "", ""],
+ ["The Camellia Sơn Trà", "Căn hộ · Giao lộ Lê Văn Lương – Lê Đức Thọ, phường Sơn Trà, Đà Nẵng", "#6b4e8a", "p2", "q1426", "", ""],
+ ["The Meridian Đà Nẵng", "Căn hộ (đã hết hàng) · KĐT Elysia Complex City, Hòa Cường, Hải Châu, Đà Nẵng", "#0f6f68", "p2", "q1348", "", ""],
+ ["Vinhomes Hải Vân Bay", "Nhà phố, biệt thự · Vịnh Nam Chơn (Làng Vân), Phường Hòa Hiệp Bắc, Quận Liên…", "#2f6a9a", "p2", "q1355", "", ""],
+ ["Alora Nha Trang - Libera Nha Trang", "Căn hộ · Bãi tiên, đường Phạm Văn Đồng, P. Nha Trang, T. Khánh Hoà", "#3f7a2e", "p2", "q1435", "", ""],
+ ["Cara World", "Nhà phố, biệt thự · Khu vực Bãi Dài, phường Cam Nghĩa, thành phố Cam Ranh,…", "#1f6f8b", "p2", "q1297", "", ""],
+ ["Cara365", "Căn hộ (đã hết hàng) · Khu vực Bãi Dài, phường Cam Nghĩa, thành phố Cam Ranh,…", "#b0582a", "p2", "q1421", "", ""],
+ ["Charmora City (cao tầng)", "Căn hộ · Phường Nam Nha Trang, TP. Nha Trang, tỉnh Khánh Hòa", "#246b9e", "p2", "q1295", "", ""],
+ ["Charmora City (thấp tầng)", "Nhà phố, biệt thự · Phường Nam Nha Trang, TP. Nha Trang, tỉnh Khánh Hòa", "#7a3b2e", "p2", "q1296", "", ""],
+ ["La Tiên Villa - Libera Nha Trang", "Nhà phố, biệt thự · Khu vực Bãi Tiên, Đại Lộ Phạm Văn Đồng, Phường Bắc Nha…", "#1f7a6b", "p2", "q1420", "", ""],
+ ["Vinhomes Pearl Bay", "Nhà phố, biệt thự · Phường Vĩnh Nguyên và Vĩnh Trường, TP. Nha Trang, Tỉnh…", "#2d6b45", "p2", "q1332", "", ""],
+ ["Central Riverside", "Nhà phố, biệt thự · Khu đô thị mới thuộc dự án số 4 KĐT mới trung tâm TP…", "#6a4a8c", "p2", "q1441", "", ""],
+ ["Eco Central Park", "Căn hộ (đã hết hàng) · Đường Nguyễn Sỹ Sách, phường Hưng Phúc, TP Vinh, tỉnh…", "#c0504d", "p2", "q1394", "", ""],
+ ["Eco Central Park (thấp tầng)", "Nhà phố, biệt thự · Đường Nguyễn Sỹ Sách, phường Hưng Phúc, TP Vinh, tỉnh…", "#3a6ea5", "p2", "q1396", "", ""],
+ ["Eurowindow Light City", "Nhà phố, biệt thự · Phường Nguyệt Viên, tỉnh Thanh Hóa", "#8a6d1e", "p2", "q1360", "", ""],
+ ["Flamingo Hải Tiến (thấp tầng)", "Nhà phố, biệt thự · Bãi biển Linh Trường, Xã Hoằng Trường, Huyện Hoằng Hóa,…", "#9a3d5c", "p2", "q1401", "", ""],
+ ["Heragon City", "Nhà phố, biệt thự · Phường Nam Ngạn - Đông Thọ - Hàm Rồng, Thành Phố Thanh Hoá", "#2f7f9e", "p2", "q1366", "", ""],
+ ["Ibiza Party Resort", "Căn hộ · Bãi biển Linh Trường, Xã Hoằng Trường, Huyện Hoằng Hóa,…", "#1d3b63", "p2", "q1400", "", ""],
+ ["Nghi Sơn Central Park", "Nhà phố, biệt thự · Phường Nguyên Bình, Thị xã Nghi Sơn, Tỉnh Thanh Hoá", "#8a4b2a", "p2", "q1434", "", ""],
+ ["Sun Glory Residences", "Căn hộ · Ngã 5 thành phố Vinh, Nghệ An", "#7a5c1e", "p2", "q1455", "", ""],
+ ["Vincom Shophouse Royal Park", "Nhà phố, biệt thự · 252 Hùng Vương, Đông Lương, Đông Hà, Quảng Trị", "#a3162b", "p2", "q1323", "", ""],
+ ["Vinhomes Star City", "Căn hộ · Đại lộ Lê Lợi, Phường Đông Hải, Thành phố Thanh Hoá", "#6b4e8a", "p2", "q1249", "", ""],
+ ["Vinhomes Star City (thấp tầng)", "Nhà phố, biệt thự (đã hết hàng) · Đại lộ Lê Lợi, Phường Đông Hải, Thành phố Thanh Hoá", "#0f6f68", "p2", "q1253", "", ""],
+ ["Vlasta Sầm Sơn", "Nhà phố, biệt thự · Phường Nam Sầm Sơn, tỉnh Thanh Hóa", "#2f6a9a", "p2", "q1442", "", ""],
+ ["Flamingo Golden Hill", "Nhà phố, biệt thự · Cốc Trại, Tam Chúc, Ninh Bình", "#3f7a2e", "p2", "q1405", "", ""],
+ ["Flamingo Heritage Onsen & Resort", "Nhà phố, biệt thự · Tân Trào, Sơn Dương, tỉnh Tuyên Quang", "#1f6f8b", "p2", "q1403", "", ""],
+ ["Flamingo Maison 108 Hồ Núi Cốc", "Nhà phố, biệt thự · Hồ Núi Cốc, xã Đại Phúc, tỉnh Thái Nguyên", "#b0582a", "p2", "q1399", "", ""],
+ ["Ion City", "Nhà phố, biệt thự · Đường Võ Văn Kiệt, phường Tiền Phong, tỉnh Bắc Ninh", "#246b9e", "p2", "q1456", "", ""],
+ ["Royal Mansion", "Căn hộ (đã hết hàng) · Số 299 Hùng Vương, Ngã 6 Bắc Ninh mới, P. Tân Tiến, TP.…", "#7a3b2e", "p2", "q1457", "", ""],
+ ["Sun Urban City", "Căn hộ · Phường Lam Hạ, TP Phủ Lý, Tỉnh Hà Nam (Ninh Bình)", "#1f7a6b", "p2", "q1320", "", ""],
+ ["Sun Urban City (thấp tầng)", "Nhà phố, biệt thự · Phường Lam Hạ, TP Phủ Lý, Tỉnh Hà Nam (Ninh Bình)", "#2d6b45", "p2", "q1318", "", ""],
+ ["Swiss Eden (thấp tầng)", "Nhà phố, biệt thự · Khu 1, xã Thanh Thủy, tỉnh Phú Thọ", "#6a4a8c", "p2", "q1467", "", ""],
+ ["Thanh Xuan Valley", "Nhà phố, biệt thự · xã Ngọc Thanh, TP. Phúc Yên, tỉnh Vĩnh Phúc", "#c0504d", "p2", "q1367", "", ""],
+ ["The Parc One", "Căn hộ · Đường Nguyễn Văn Cừ, P. Bắc Giang, tỉnh Bắc Ninh", "#3a6ea5", "p2", "q1424", "", ""]];
 // số liệu bộ hỏi đáp: [chủ đề, cách hỏi, số câu hỏi tra được (ước tính: các cách hỏi + 5 dạng hỏi cho mỗi căn có dữ liệu)] – cập nhật 24/10/2026
 const STAT={"sc": [29, 228, 1600], "sb": [24, 203, 1500], "lm": [22, 193, 300], "sf": [28, 215, 600], "ih": [29, 228, 700], "": [68, 404, 2700], "ab": [31, 230, 1400], "hlx": [30, 236, 5300], "ho": [21, 128, 730], "sk": [20, 118, 480], "se": [7, 35, 85], "nx": [25, 140, 140], "dk": [11, 61, 3351], "xi": [10, 52, 617], "es": [12, 53, 1268], "ri": [7, 35, 785], "fc": [7, 35, 695], "am": [7, 35, 270], "ru": [7, 35, 190], "ga": [7, 35, 140], "cv": [7, 35, 45], "np": [7, 35, 40], "js": [9, 40, 90]};
-const RG={"js": "HN", "p1344": "HN", "p1427": "HN", "p1448": "HN", "p1280": "HN", "p1411": "HN", "p1432": "HN", "p1409": "HN", "p1388": "HN", "p872": "HN", "p1281": "HN", "p1382": "HN", "p1404": "HN", "p1351": "HN", "p1386": "HN", "p1371": "HN", "p466": "HN", "p1341": "HN", "p1418": "HN", "p1412": "HN", "p1376": "HN", "p1279": "HN", "p1443": "HN", "p297": "HN", "p102": "HN", "p1276": "HN", "p1248": "HN", "p1446": "HN", "p1339": "HN", "p1431": "HN", "p1459": "HN", "p1464": "HN", "p1365": "HN", "p1358": "HN", "p1368": "HN", "p1375": "HN", "p1359": "HN", "p1414": "HN", "p1325": "HN", "p1469": "HN", "p1251": "HN", "p1395": "HN", "p1352": "HN", "p1450": "HN", "p1378": "HN", "p604": "HN", "p1445": "HN", "p1287": "HN", "p1381": "HN", "p586": "HN", "p1390": "HN", "p1419": "HN", "p1451": "HN", "p1425": "HN", "p1282": "HN", "p1350": "HN", "p1454": "HN", "p308": "HN", "p92": "HN", "p788": "HN", "p465": "HN", "p1461": "HN", "p1393": "HN", "p1261": "HY", "p1430": "HY", "p1321": "HY", "p1315": "HY", "p1463": "HY", "p1422": "HY", "p358": "HY", "p1310": "HY", "p1330": "HY", "p533": "HY", "p1292": "HY", "p1453": "HY", "p1265": "HY", "p87": "HY", "p355": "HY"};
-const RN={QH:"Quảng Ninh – Hải Phòng",HN:"Hà Nội",HY:"Hưng Yên"};
+const RG={"js": "HN", "p1344": "HN", "p1427": "HN", "p1448": "HN", "p1280": "HN", "p1411": "HN", "p1432": "HN", "p1409": "HN", "p1388": "HN", "p872": "HN", "p1281": "HN", "p1382": "HN", "p1404": "HN", "p1351": "HN", "p1386": "HN", "p1371": "HN", "p466": "HN", "p1341": "HN", "p1418": "HN", "p1412": "HN", "p1376": "HN", "p1279": "HN", "p1443": "HN", "p297": "HN", "p102": "HN", "p1276": "HN", "p1248": "HN", "p1446": "HN", "p1339": "HN", "p1431": "HN", "p1459": "HN", "p1464": "HN", "p1365": "HN", "p1358": "HN", "p1368": "HN", "p1375": "HN", "p1359": "HN", "p1414": "HN", "p1325": "HN", "p1469": "HN", "p1251": "HN", "p1395": "HN", "p1352": "HN", "p1450": "HN", "p1378": "HN", "p604": "HN", "p1445": "HN", "p1287": "HN", "p1381": "HN", "p586": "HN", "p1390": "HN", "p1419": "HN", "p1451": "HN", "p1425": "HN", "p1282": "HN", "p1350": "HN", "p1454": "HN", "p308": "HN", "p92": "HN", "p788": "HN", "p465": "HN", "p1461": "HN", "p1393": "HN", "p1261": "HY", "p1430": "HY", "p1321": "HY", "p1315": "HY", "p1463": "HY", "p1422": "HY", "p358": "HY", "p1310": "HY", "p1330": "HY", "p533": "HY", "p1292": "HY", "p1453": "HY", "p1265": "HY", "p87": "HY", "p355": "HY", "q1466": "DN", "q1277": "NAM", "q1355": "DN", "q1385": "NAM", "q612": "NAM", "q1295": "KH", "q1333": "NAM", "q1332": "KH", "q1296": "KH", "q613": "NAM", "q771": "NAM", "q772": "NAM", "q1249": "BTB", "q1258": "NAM", "q1037": "NAM", "q1435": "KH", "q1260": "NAM", "q1363": "DN", "q1285": "DN", "q1406": "DN", "q1275": "DN", "q1308": "DN", "q1320": "BK", "q1391": "DN", "q1272": "NAM", "q1456": "BK", "q1289": "NAM", "q1420": "KH", "q1356": "NAM", "q1426": "DN", "q1318": "BK", "q1290": "NAM", "q1306": "DN", "q1423": "NAM", "q1353": "NAM", "q1413": "NAM", "q1337": "DN", "q1366": "BTB", "q1424": "BK", "q1370": "NAM", "q1297": "KH", "q1367": "BK", "q1389": "NAM", "q1455": "BTB", "q1396": "BTB", "q1360": "BTB", "q1323": "BTB", "q1434": "BTB", "q1399": "BK", "q1441": "BTB", "q1442": "BTB", "q1400": "BTB", "q1401": "BTB", "q1403": "BK", "q1405": "BK", "q1467": "BK", "q1468": "NAM", "q1460": "NAM", "q1253": "BTB", "q790": "DN", "q1269": "DN", "q1362": "DN", "q1326": "DN", "q1328": "DN", "q1457": "BK", "q1348": "DN", "p1314": "HN", "q1327": "NAM", "q1394": "BTB", "q1421": "KH"};
+const RN={QH:"Quảng Ninh – Hải Phòng",HN:"Hà Nội",HY:"Hưng Yên",NAM:"TP.HCM – miền Nam",DN:"Đà Nẵng",KH:"Khánh Hòa",BTB:"Bắc Trung Bộ",BK:"Miền Bắc khác"};
 const nf=n=>n.toLocaleString("vi-VN");
 const url=(base,page)=>base+(page?"?page="+page:"");
 const list=document.getElementById("list");
@@ -218,7 +288,7 @@ list.innerHTML=PROJ.map(([n,w,c,p,qa,dt,dtl])=>{const b=p==="p1"?P1:P2;
   const cnt=r=>S.filter(e=>!r||e.dataset.r===r).length;
   const fold=t=>t.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/đ/g,"d");
   let cur="QH"; try{cur=localStorage.getItem("hl_rg")||"QH";}catch(e){}
-  bar.innerHTML=["QH","HN","HY",""].map(r=>`<button type="button" data-r="${r}">${r?RN[r]:"Tất cả"} <span>${cnt(r)}</span></button>`).join("");
+  bar.innerHTML=["QH","HN","HY","NAM","DN","KH","BTB","BK",""].map(r=>`<button type="button" data-r="${r}">${r?RN[r]:"Tất cả"} <span>${cnt(r)}</span></button>`).join("");
   function apply(){const t=fold((q.value||"").trim().toLowerCase()); let n=0;
     S.forEach(e=>{const ok=(!cur||e.dataset.r===cur)&&(!t||fold(e.dataset.s).includes(t)); e.style.display=ok?"":"none"; if(ok) n++;});
     bar.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.r===cur?"true":"false"));
